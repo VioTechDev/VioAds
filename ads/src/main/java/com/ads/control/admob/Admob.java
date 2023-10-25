@@ -2705,6 +2705,81 @@ public class Admob {
         }
     }
 
+    public void populateUnifiedBannerAdView(final Activity mActivity, final AdView adView, final FrameLayout adContainer) {
+        if (Arrays.asList(mActivity.getResources().getStringArray(R.array.list_id_test)).contains(adView.getAdUnitId())) {
+            showTestIdAlert(mActivity, BANNER_ADS, adView.getAdUnitId());
+        }
+        try {
+            adContainer.addView(adView);
+            adContainer.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void requestLoadBanner(final Activity mActivity, String id, final AdCallback callback, Boolean useInlineAdaptive, String inlineStyle) {
+        if (Arrays.asList(mActivity.getResources().getStringArray(R.array.list_id_test)).contains(id)) {
+            showTestIdAlert(mActivity, BANNER_ADS, id);
+        }
+        if (AppPurchase.getInstance().isPurchased(mActivity)) {
+            callback.onAdFailedToLoad(new LoadAdError(1999, "App isPurchased", "", null, null));
+            return;
+        }
+
+        try {
+            AdView adView = new AdView(mActivity);
+            adView.setAdUnitId(id);
+            AdSize adSize = getAdSize(mActivity, useInlineAdaptive, inlineStyle);
+            adView.setAdSize(adSize);
+            adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            adView.setAdListener(new AdListener() {
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    callback.onAdFailedToLoad(loadAdError);
+                }
+
+
+                @Override
+                public void onAdLoaded() {
+                    Log.d(TAG, "Banner adapter class name: " + adView.getResponseInfo().getMediationAdapterClassName());
+                    callback.onBannerLoaded(adView);
+                    adView.setOnPaidEventListener(adValue -> {
+                        Log.d(TAG, "OnPaidEvent banner:" + adValue.getValueMicros());
+
+                        VioLogEventManager.logPaidAdImpression(context,
+                                adValue,
+                                adView.getAdUnitId(),
+                                adView.getResponseInfo()
+                                        .getMediationAdapterClassName(), AdType.BANNER);
+                    });
+                }
+
+                @Override
+                public void onAdClicked() {
+                    super.onAdClicked();
+                    if (disableAdResumeWhenClickAds)
+                        AppOpenManager.getInstance().disableAdResumeByClickAction();
+                    if (callback != null) {
+                        callback.onAdClicked();
+                        Log.d(TAG, "onAdClicked");
+                    }
+                    VioLogEventManager.logClickAdsEvent(context, id);
+                }
+
+                @Override
+                public void onAdImpression() {
+                    super.onAdImpression();
+                    if (callback != null) {
+                        callback.onAdImpression();
+                    }
+                }
+            });
+            adView.loadAd(getAdRequest());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     enum LoadAdsStatus {
         LOADING, FAIL, SUCCESS, SHOWING
     }
