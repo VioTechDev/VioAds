@@ -100,6 +100,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        VioAdmob.getInstance().loadNative3SameTime(this, "ca-app-pub-3940256099942544/104496011215", "ca-app-pub-3940256099942544/1044960115", "ca-app-pub-3940256099942544/2247696110", R.layout.custom_native_admod_medium, new VioAdmobCallback() {
+            @Override
+            public void onNativeAdLoaded(@NonNull ApNativeAd nativeAd) {
+                super.onNativeAdLoaded(nativeAd);
+                Log.e(TAG, "onNativeAdLoaded: ");
+                VioAdmob.getInstance().populateNativeAdView(MainActivity.this, nativeAd, binding.flNativeAds, binding.includeShimmer.shimmerContainerNative);
+            }
+
+            @Override
+            public void onAdFailedToLoad(@Nullable ApAdError adError) {
+                super.onAdFailedToLoad(adError);
+                Log.e(TAG, "onAdFailedToLoad: " + adError.getMessage());
+            }
+        });
+
 
         AppPurchase.getInstance().setPurchaseListener(new PurchaseListener() {
             @Override

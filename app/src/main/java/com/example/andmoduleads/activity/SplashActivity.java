@@ -8,28 +8,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ads.control.admob.AppOpenManager;
 import com.ads.control.ads.VioAdmob;
 import com.ads.control.ads.VioAdmobCallback;
-import com.ads.control.ads.wrapper.ApInterstitialAd;
-import com.ads.control.config.VioAdmobConfig;
 import com.ads.control.ads.VioAdmobInitCallback;
 import com.ads.control.ads.wrapper.ApAdError;
 import com.ads.control.ads.wrapper.ApNativeAd;
 import com.ads.control.billing.AppPurchase;
+import com.ads.control.config.VioAdmobConfig;
 import com.ads.control.funtion.BillingListener;
 import com.example.andmoduleads.BuildConfig;
 import com.example.andmoduleads.R;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.appopen.AppOpenAd;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final String TAG = "AperoAd";
+    private static final String TAG = "VioAds";
     private List<String> list = new ArrayList<>();
     private String idAdSplash;
     private Boolean isFirst = true;
@@ -46,7 +41,7 @@ public class SplashActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        loadSplash();
+                        load3InterSplash();
                         //loadOpenAppAds();
                         //loadInterPriorityAd();
                         //load3InterSplash();
@@ -57,6 +52,99 @@ public class SplashActivity extends AppCompatActivity {
         }, 5000);
 
         AppPurchase.getInstance().setEventConsumePurchaseTest(findViewById(R.id.txtLoading));
+    }
+
+    private void load3InterSplash() {
+        VioAdmob.getInstance().loadSplashInterPriority3SameTime(this,
+                BuildConfig.ad_inter_splash_piority,
+                BuildConfig.ad_inter_splash_medium,
+                BuildConfig.ad_interstitial_splash,
+                30000,
+                3000,
+                true,
+                new VioAdmobCallback() {
+                    @Override
+                    public void onAdSplashPriorityReady() {
+                        super.onAdSplashPriorityReady();
+                        Log.i(TAG, "onAdSplashHighFloorReady: ");
+                        showInter3Sametime();
+                    }
+
+                    @Override
+                    public void onAdPriorityFailedToLoad(@Nullable ApAdError adError) {
+                        super.onAdPriorityFailedToLoad(adError);
+                        Log.e(TAG, "onAdHighFloorFailedToLoad: " + adError);
+                    }
+
+                    @Override
+                    public void onAdSplashPriorityMediumReady() {
+                        super.onAdSplashPriorityMediumReady();
+                        Log.i(TAG, "onAdSplashHighMediumReady: ");
+                        showInter3Sametime();
+                    }
+
+                    @Override
+                    public void onAdPriorityMediumFailedToLoad(@Nullable ApAdError adError) {
+                        super.onAdPriorityMediumFailedToLoad(adError);
+                        Log.i(TAG, "onAdMediumFailedToLoad: " + adError);
+                    }
+
+                    @Override
+                    public void onAdSplashReady() {
+                        super.onAdSplashReady();
+                        Log.i(TAG, "onAdSplashReady: ");
+                        showInter3Sametime();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable ApAdError adError) {
+                        super.onAdFailedToLoad(adError);
+                        Log.e(TAG, "onAdFailedToLoad: ");
+                    }
+
+                    @Override
+                    public void onNextAction() {
+                        super.onNextAction();
+                        startMain();
+                        Log.i(TAG, "onNextAction:1 ");
+                    }
+                });
+    }
+
+    private void showInter3Sametime() {
+        VioAdmob.getInstance().onShowSplashPriority3(SplashActivity.this, new VioAdmobCallback() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                startMain();
+                Log.e(TAG, "onAdClosed: ");
+            }
+
+            @Override
+            public void onAdPriorityFailedToShow(@Nullable ApAdError adError) {
+                super.onAdPriorityFailedToShow(adError);
+                Log.e(TAG, "onAdPriorityFailedToShow: ");
+            }
+
+            @Override
+            public void onAdPriorityMediumFailedToShow(@Nullable ApAdError adError) {
+                super.onAdPriorityMediumFailedToShow(adError);
+                Log.e(TAG, "onAdPriorityMediumFailedToShow: ");
+            }
+
+            @Override
+            public void onAdFailedToShow(@Nullable ApAdError adError) {
+                super.onAdFailedToShow(adError);
+                Log.e(TAG, "onAdFailedToShow: ");
+            }
+
+            @Override
+            public void onNextAction() {
+                super.onNextAction();
+                //startMain();
+                Log.e(TAG, "onNextAction: ");
+            }
+        });
     }
 
 
@@ -129,7 +217,7 @@ public class SplashActivity extends AppCompatActivity {
             return;
         }
 
-        VioAdmob.getInstance().onCheckShowSplashWhenFail(this, adCallback, 1000);
+        VioAdmob.getInstance().onCheckShowSplashPriority3WhenFail(this, adCallback, 1000);
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,7 +79,7 @@ import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 
 public class VioAdmob {
     public static final String TAG_ADJUST = "VioAdjust";
-    public static final String TAG = "VioAdmob";
+    public static final String TAG = "VioAdmob_ADDD";
     private static volatile VioAdmob INSTANCE;
     private VioAdmobConfig adConfig;
     private VioAdmobInitCallback initCallback;
@@ -420,6 +419,325 @@ public class VioAdmob {
     public void loadSplashInterstitialAds(final Context context, String id, long timeOut, long timeDelay, VioAdmobCallback adListener) {
         loadSplashInterstitialAds(context, id, timeOut, timeDelay, true, adListener);
     }
+
+    public void loadSplashInterPriority3SameTime(final Context context,
+                                                 String idAdsPriority,
+                                                 String idAdsMedium,
+                                                 String idAdsNormal,
+                                                 long timeOut,
+                                                 long timeDelay,
+                                                 boolean showSplashIfReady,
+                                                 VioAdmobCallback adListener) {
+        switch (adConfig.getMediationProvider()) {
+            case VioAdmobConfig.PROVIDER_ADMOB:
+                Admob.getInstance().loadInterSplashPriority3SameTime(context, idAdsPriority, idAdsMedium, idAdsNormal, timeOut, timeDelay, adListener);
+                break;
+            case VioAdmobConfig.PROVIDER_MAX:
+                AppLovin.getInstance().loadSplashInterstitialAds(context, idAdsNormal, timeOut, timeDelay, new AppLovinCallback() {
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        adListener.onAdClosed();
+                        adListener.onNextAction();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable MaxError i) {
+                        super.onAdFailedToLoad(i);
+                        adListener.onAdFailedToLoad(new ApAdError(i));
+                        adListener.onNextAction();
+                    }
+
+                    @Override
+                    public void onAdFailedToShow(@Nullable MaxError adError) {
+                        super.onAdFailedToShow(adError);
+                        adListener.onAdFailedToShow(new ApAdError(adError));
+                        adListener.onNextAction();
+                    }
+
+                    @Override
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                        adListener.onAdLoaded();
+                    }
+
+                    @Override
+                    public void onAdSplashReady() {
+                        super.onAdSplashReady();
+                        adListener.onAdSplashReady();
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        if (adListener != null) {
+                            adListener.onAdClicked();
+                        }
+                    }
+                });
+        }
+    }
+
+    public void onShowSplashPriority3(AppCompatActivity activity, VioAdmobCallback adListener) {
+        switch (adConfig.getMediationProvider()) {
+            case VioAdmobConfig.PROVIDER_ADMOB:
+                Admob.getInstance().onShowSplashPriority3(activity, new VioAdmobCallback() {
+                    @Override
+                    public void onAdPriorityMediumFailedToShow(@Nullable ApAdError adError) {
+                        super.onAdPriorityMediumFailedToShow(adError);
+                        Log.e(TAG, "onAdPriorityMediumFailedToShow1: ");
+                    }
+
+                    @Override
+                    public void onAdPriorityFailedToShow(@Nullable ApAdError adError) {
+                        super.onAdPriorityFailedToShow(adError);
+                        Log.e(TAG, "onAdPriorityFailedToShow: ");
+                    }
+
+                    @Override
+                    public void onAdFailedToShow(@Nullable ApAdError adError) {
+                        super.onAdFailedToShow(adError);
+                        Log.e(TAG, "onAdFailedToShow: ");
+                    }
+
+                    @Override
+                    public void onNextAction() {
+                        super.onNextAction();
+                        adListener.onNextAction();
+                    }
+
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        adListener.onAdClosed();
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        adListener.onAdClicked();
+                    }
+                });
+                break;
+            case VioAdmobConfig.PROVIDER_MAX:
+                AppLovin.getInstance().onShowSplash(activity, new AppLovinCallback() {
+                    @Override
+                    public void onAdFailedToShow(@Nullable MaxError adError) {
+                        super.onAdFailedToShow(adError);
+                        adListener.onAdFailedToShow(new ApAdError(adError));
+                    }
+
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        adListener.onAdClosed();
+                        adListener.onNextAction();
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        adListener.onAdClicked();
+                    }
+                });
+
+        }
+    }
+
+
+    public void onCheckShowSplashPriority3WhenFail(AppCompatActivity activity, VioAdmobCallback callback,
+                                                   int timeDelay) {
+        switch (adConfig.getMediationProvider()) {
+            case VioAdmobConfig.PROVIDER_ADMOB:
+                Admob.getInstance().onCheckShowSplashPriority3WhenFail(activity, new VioAdmobCallback() {
+                    @Override
+                    public void onNextAction() {
+                        super.onAdClosed();
+                        callback.onNextAction();
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        callback.onAdClicked();
+                    }
+
+                    @Override
+                    public void onAdImpression() {
+                        super.onAdImpression();
+                        callback.onAdImpression();
+                    }
+
+                    @Override
+                    public void onAdPriorityFailedToShow(@Nullable ApAdError adError) {
+                        super.onAdPriorityFailedToShow(adError);
+                        callback.onAdPriorityFailedToShow(adError);
+                    }
+
+                    @Override
+                    public void onAdPriorityMediumFailedToShow(@Nullable ApAdError adError) {
+                        super.onAdPriorityMediumFailedToShow(adError);
+                        callback.onAdPriorityMediumFailedToShow(adError);
+                    }
+
+                    @Override
+                    public void onAdFailedToShow(@Nullable ApAdError adError) {
+                        super.onAdFailedToShow(adError);
+                        callback.onAdFailedToShow(adError);
+                    }
+                }, timeDelay);
+                break;
+            case VioAdmobConfig.PROVIDER_MAX:
+                AppLovin.getInstance().onCheckShowSplashWhenFail(activity, new AppLovinCallback() {
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        callback.onNextAction();
+                    }
+
+
+                    @Override
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                        callback.onAdLoaded();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable MaxError i) {
+                        super.onAdFailedToLoad(i);
+                        callback.onAdFailedToLoad(new ApAdError(i));
+                    }
+
+                    @Override
+                    public void onAdFailedToShow(@Nullable MaxError adError) {
+                        super.onAdFailedToShow(adError);
+                        callback.onAdFailedToShow(new ApAdError(adError));
+                    }
+                }, timeDelay);
+        }
+    }
+
+    private boolean isFinishLoadNativeAdPriority = false;
+    private boolean isFinishLoadNativeAdMedium = false;
+    private boolean isFinishLoadNativeAdNormal = false;
+    private ApNativeAd apNativeAdNormal = null;
+    private ApNativeAd apNativeAdMedium = null;
+
+    public void loadNative3SameTime(final Activity activity, String idAdPriority, String idAdMedium, String idAdNormal, int layoutCustomNative, VioAdmobCallback adCallback) {
+        isFinishLoadNativeAdPriority = false;
+        isFinishLoadNativeAdMedium = false;
+        isFinishLoadNativeAdNormal = false;
+
+        apNativeAdMedium = null;
+        apNativeAdNormal = null;
+        loadNativeAdResultCallback(activity, idAdPriority, layoutCustomNative, new VioAdmobCallback() {
+                    @Override
+                    public void onNativeAdLoaded(@NonNull ApNativeAd nativeAd) {
+                        super.onNativeAdLoaded(nativeAd);
+                        Log.d(TAG, "onNativeAdLoaded: loadAdNative3Sametime priority");
+                        adCallback.onNativeAdLoaded(nativeAd);
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        adCallback.onAdClicked();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable ApAdError adError) {
+                        super.onAdFailedToLoad(adError);
+                        Log.e(TAG, "onAdFailedToLoad: loadAdNative3Sametime priority - " + adError.getMessage());
+                        if (isFinishLoadNativeAdMedium) {
+                            if (apNativeAdMedium != null) {
+                                adCallback.onNativeAdLoaded(apNativeAdMedium);
+                            } else {
+                                if (isFinishLoadNativeAdNormal) {
+                                    if (apNativeAdNormal != null) {
+                                        adCallback.onNativeAdLoaded(apNativeAdNormal);
+                                    } else {
+                                        adCallback.onAdFailedToLoad(adError);
+                                    }
+                                } else {
+                                    isFinishLoadNativeAdPriority = true;
+                                }
+                            }
+                        } else {
+                            isFinishLoadNativeAdPriority = true;
+                        }
+                    }
+                }
+        );
+        loadNativeAdResultCallback(activity, idAdMedium, layoutCustomNative, new VioAdmobCallback() {
+                    @Override
+                    public void onNativeAdLoaded(@NonNull ApNativeAd nativeAd) {
+                        super.onNativeAdLoaded(nativeAd);
+                        Log.d(TAG, "onNativeAdLoaded: loadAdNative3Sametime medium");
+                        if (isFinishLoadNativeAdPriority) {
+                            adCallback.onNativeAdLoaded(nativeAd);
+                        } else {
+                            apNativeAdMedium = nativeAd;
+                            isFinishLoadNativeAdMedium = true;
+                        }
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        adCallback.onAdClicked();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable ApAdError adError) {
+                        super.onAdFailedToLoad(adError);
+                        Log.e(TAG, "onAdFailedToLoad: loadAdNative3Sametime medium - " + adError.getMessage());
+                        if (isFinishLoadNativeAdPriority && isFinishLoadNativeAdNormal) {
+                            if (apNativeAdNormal != null) {
+                                adCallback.onNativeAdLoaded(apNativeAdNormal);
+                            } else {
+                                adCallback.onAdFailedToLoad(adError);
+                            }
+                        } else {
+                            apNativeAdMedium = null;
+                            isFinishLoadNativeAdMedium = true;
+                        }
+                    }
+                }
+        );
+        loadNativeAdResultCallback(activity, idAdNormal, layoutCustomNative, new VioAdmobCallback() {
+                    @Override
+                    public void onNativeAdLoaded(@NonNull ApNativeAd nativeAd) {
+                        super.onNativeAdLoaded(nativeAd);
+                        Log.d(TAG, "onNativeAdLoaded: loadAdNative3Sametime normal");
+                        if (isFinishLoadNativeAdPriority && isFinishLoadNativeAdMedium && apNativeAdMedium == null) {
+                            adCallback.onNativeAdLoaded(nativeAd);
+                        } else {
+                            apNativeAdNormal = nativeAd;
+                            isFinishLoadNativeAdNormal = true;
+                        }
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        adCallback.onAdClicked();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable ApAdError adError) {
+                        super.onAdFailedToLoad(adError);
+                        Log.e(TAG, "onAdFailedToLoad: loadAdNative3Sametime normal - " + adError.getMessage());
+                        if (isFinishLoadNativeAdPriority && isFinishLoadNativeAdMedium && apNativeAdMedium == null) {
+                            adCallback.onAdFailedToLoad(adError);
+                        } else {
+                            apNativeAdNormal = null;
+                            isFinishLoadNativeAdNormal = true;
+                        }
+                    }
+                }
+        );
+    }
+
 
     public void loadSplashInterstitialAds(final Context context, String id, long timeOut, long timeDelay, boolean showSplashIfReady, VioAdmobCallback adListener) {
         switch (adConfig.getMediationProvider()) {
