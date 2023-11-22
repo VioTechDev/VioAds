@@ -69,6 +69,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.appevents.FlushResult;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.nativead.NativeAd;
@@ -76,6 +77,8 @@ import com.google.android.gms.ads.nativead.NativeAdView;
 import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
+
+import org.jetbrains.annotations.NotNull;
 
 public class VioAdmob {
     public static final String TAG_ADJUST = "VioAdjust";
@@ -384,6 +387,22 @@ public class VioAdmob {
                         adCallback.onAdImpression();
                     }
                 });
+        }
+    }
+
+    public void requestLoadBanner(final Activity activity, @NotNull String idBannerAd, final AdCallback adCallback) {
+        if (adConfig.getMediationProvider() == VioAdmobConfig.PROVIDER_ADMOB) {
+            Admob.getInstance().requestLoadBanner(activity, idBannerAd, adCallback, false, Admob.BANNER_INLINE_LARGE_STYLE);
+        } else {
+            /*no op*/
+        }
+    }
+
+    public void populateUnifiedBannerAdView(final Activity mActivity, final AdView adView, final FrameLayout adContainer) {
+        if (adConfig.getMediationProvider() == VioAdmobConfig.PROVIDER_ADMOB) {
+            Admob.getInstance().populateUnifiedBannerAdView(mActivity, adView, adContainer);
+        } else {
+            /*no op*/
         }
     }
 
