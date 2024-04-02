@@ -7,12 +7,12 @@ import android.util.Log
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.LoadAdError
 import com.ads.admob.AdmobManager
 import com.ads.admob.data.ContentAd
 import com.ads.admob.dialog.LoadingAdsDialog
 import com.ads.admob.listener.AppOpenAdCallBack
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
@@ -51,6 +51,9 @@ class AppResumeAdHelper(
     fun setEnableAppResumeOnScreen() {
         isDisableAppResumeOnScreen = false
     }
+
+    private var oldActivity: Activity? = null
+    private var isFistResumeApp = true
 
     init {
         lifecycleOwner.lifecycle.addObserver(this)
@@ -119,7 +122,15 @@ class AppResumeAdHelper(
 
     private fun handleShowAppOpenResume(activity: Activity) {
         if (!isRequestAppResumeValid) return
-        if (appOpenAdManager.isAdAvailable()){
+        if (oldActivity != activity) {
+            oldActivity = activity
+            isFistResumeApp = true
+        }
+        if (isFistResumeApp) {
+            isFistResumeApp = false
+            return
+        }
+        if (appOpenAdManager.isAdAvailable()) {
             lifecycleOwner.lifecycleScope.launch {
                 showDialogLoading(activity)
                 delay(800)

@@ -1,31 +1,76 @@
-package com.example.andmoduleads.activity;
+package com.example.andmoduleads.activity
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.ads.admob.data.ContentAd
+import com.ads.admob.helper.interstitial.InterstitialAdSplashConfig
+import com.ads.admob.helper.interstitial.InterstitialAdSplashHelper
+import com.ads.admob.helper.interstitial.params.InterstitialAdParam
+import com.ads.admob.listener.InterstitialAdCallback
+import com.example.andmoduleads.R
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+class SplashActivity : AppCompatActivity() {
+    private val list: List<String> = ArrayList()
+    private val idAdSplash: String? = null
+    private val isFirst = true
+    private val interAdSplashHelper by lazy { initInterAdSplash() }
+    private fun initInterAdSplash(): InterstitialAdSplashHelper {
+        val config = InterstitialAdSplashConfig(
+            idAds = "ca-app-pub-3940256099942544/1033173712",
+            canShowAds = true,
+            canReloadAds = true,
+            timeDelay = 5000L,
+            timeOut = 30000L,
+            showReady = true
+        )
+        return InterstitialAdSplashHelper(
+            activity = this,
+            lifecycleOwner = this,
+            config = config
+        ).apply {
+            registerAdListener(interAdCallBack)
 
+        }
+    }
 
-import com.example.andmoduleads.BuildConfig;
-import com.example.andmoduleads.R;
+    private val interAdCallBack = object : InterstitialAdCallback {
+        override fun onNextAction() {
+            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+        }
 
-import java.util.ArrayList;
-import java.util.List;
+        override fun onAdClose() {
+            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+        }
 
-public class SplashActivity extends AppCompatActivity {
+        override fun onInterstitialShow() {
+        }
 
-    private static final String TAG = "VioAds";
-    private List<String> list = new ArrayList<>();
-    private String idAdSplash;
-    private Boolean isFirst = true;
+        override fun onAdLoaded(data: ContentAd.AdmobAd.ApInterstitialAd) {
+        }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+        }
 
+        override fun onAdClicked() {
+        }
+
+        override fun onAdImpression() {
+        }
+
+        override fun onAdFailedToShow(adError: AdError) {
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_splash)
+        interAdSplashHelper.requestAds(InterstitialAdParam.Request)
+    }
+
+    companion object {
+        private const val TAG = "VioAds"
     }
 }
