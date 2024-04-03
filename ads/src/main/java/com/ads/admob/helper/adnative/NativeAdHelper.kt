@@ -7,16 +7,16 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.nativead.NativeAd
 import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.AdsHelper
 import com.ads.admob.helper.adnative.params.AdNativeState
 import com.ads.admob.helper.adnative.params.NativeAdParam
 import com.ads.admob.listener.NativeAdCallback
+import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.nativead.NativeAd
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +42,7 @@ class NativeAdHelper(
     private var flagEnableReload = config.canReloadAds
     private var shimmerLayoutView: ShimmerFrameLayout? = null
     private var nativeContentView: FrameLayout? = null
+    private var isRequestValid = true
     var nativeAd: NativeAd? = null
         private set
 
@@ -67,6 +68,10 @@ class NativeAdHelper(
                 logZ("Resume repeat ${resumeCount.get()} times")
             }
             if (event == Lifecycle.Event.ON_RESUME && resumeCount.get() > 1 && nativeAd != null && canRequestAds() && canReloadAd() && isActiveState()) {
+                if (!isRequestValid) {
+                    isRequestValid = true
+                    return@onEach
+                }
                 requestAds(NativeAdParam.Request)
             }
         }.launchIn(lifecycleOwner.lifecycleScope)
@@ -180,6 +185,7 @@ class NativeAdHelper(
             }
 
             override fun onAdImpression() {
+                isRequestValid = lifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED
                 logZ("Native onAdImpression")
             }
 

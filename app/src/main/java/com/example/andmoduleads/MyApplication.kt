@@ -20,7 +20,8 @@ class MyApplication : Application() {
         listClassInValid.add(SplashActivity::class.java)
         val config = AppResumeAdConfig(
             idAds = "ca-app-pub-3940256099942544/9257395921",
-            listClassInValid = listClassInValid
+            listClassInValid = listClassInValid,
+            canShowAds = false
         )
         return AppResumeAdHelper(
             application = this,
@@ -32,7 +33,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         application = this
-        initAppOpenAd()
+        initAppOpenAd().setRequestAppResumeValid(false)
     }
 
     companion object {
