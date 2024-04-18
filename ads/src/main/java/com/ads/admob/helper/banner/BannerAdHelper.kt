@@ -9,17 +9,18 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
 import com.ads.admob.admob.AdmobFactory
+import com.ads.admob.admob.BannerInlineStyle
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.AdsHelper
 import com.ads.admob.helper.banner.params.AdBannerState
 import com.ads.admob.helper.banner.params.BannerAdParam
-import com.ads.control.R
 import com.ads.admob.listener.BannerAdCallBack
+import com.ads.control.R
+import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,6 +47,8 @@ class BannerAdHelper(
     private val resumeCount: AtomicInteger = AtomicInteger(0)
     private var shimmerLayoutView: ShimmerFrameLayout? = null
     private var bannerContentView: FrameLayout? = null
+    private var isRequestValid = true
+
     var bannerAdView: AdView? = null
         private set
 
@@ -75,6 +78,10 @@ class BannerAdHelper(
                 }
             }
             if (event == Lifecycle.Event.ON_RESUME && resumeCount.get() > 1 && bannerAdView != null && canRequestAds() && canReloadAd() && isActiveState()) {
+                if (!isRequestValid){
+                    isRequestValid = true
+                    return@onEach
+                }
                 logZ("requestAds on resume")
                 requestAds(BannerAdParam.Request)
             }
@@ -105,7 +112,9 @@ class BannerAdHelper(
                     val oldHeight = bannerContentView.height
                     bannerContentView.let {
                         it.removeAllViews()
-                        it.addView(view, 0, oldHeight)
+                        if (!config.useInlineAdaptive && config.bannerInlineStyle == BannerInlineStyle.SMALL_STYLE) {
+                            it.addView(view, 0, oldHeight)
+                        }
                         it.addView(adsParam.adBanner)
                     }
                 }
@@ -165,6 +174,8 @@ class BannerAdHelper(
                     activity,
                     config.idAds,
                     config.collapsibleGravity,
+                    config.bannerInlineStyle,
+                    config.useInlineAdaptive,
                     invokeListenerAdCallback()
                 )
         }
@@ -225,6 +236,7 @@ class BannerAdHelper(
             }
 
             override fun onAdImpression() {
+                isRequestValid = lifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED
                 invokeAdListener { it.onAdImpression() }
             }
 

@@ -6,17 +6,16 @@ import android.view.View
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.AdapterResponseInfo
-import com.google.android.gms.ads.LoadAdError
 import com.ads.admob.AdmobManager
-import com.ads.admob.BannerInlineStyle
 import com.ads.admob.data.ContentAd
 import com.ads.admob.getAdRequest
 import com.ads.admob.getAdSize
 import com.ads.admob.getCollapsibleAdRequest
 import com.ads.admob.listener.BannerAdCallBack
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.AdapterResponseInfo
+import com.google.android.gms.ads.LoadAdError
 
 
 /**
@@ -27,12 +26,14 @@ class AdmobBannerFactoryImpl : AdmobBannerFactory {
         context: Context,
         adId: String,
         collapsibleGravity: String?,
+        bannerInlineStyle: Int,
+        useInlineAdaptive: Boolean,
         adCallback: BannerAdCallBack
     ) {
         try {
             val adView = AdView(context)
             adView.adUnitId = adId
-            val adSize = getAdSize(context as Activity, false, BannerInlineStyle.LARGE_STYLE)
+            val adSize = getAdSize(context as Activity, useInlineAdaptive, bannerInlineStyle)
             adView.setAdSize(adSize)
             adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
             adView.adListener = object : AdListener() {

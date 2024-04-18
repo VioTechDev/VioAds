@@ -63,10 +63,19 @@ class AdmobFactoryImpl : AdmobFactory {
         context: Context,
         adId: String,
         collapsibleGravity: String?,
+        bannerInlineStyle: Int,
+        useInlineAdaptive: Boolean,
         adCallback: BannerAdCallBack
     ) {
         AdmobBannerFactory.getInstance()
-            .requestBannerAd(context, adId, collapsibleGravity, adCallback)
+            .requestBannerAd(
+                context,
+                adId,
+                collapsibleGravity,
+                bannerInlineStyle,
+                useInlineAdaptive,
+                adCallback
+            )
     }
 
     override fun requestNativeAd(

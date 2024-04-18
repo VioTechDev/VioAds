@@ -3,6 +3,7 @@ package com.ads.admob
 import android.app.Activity
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 import com.google.ads.mediation.admob.AdMobAdapter
@@ -12,7 +13,7 @@ import com.google.android.gms.ads.AdSize
  * Created by ViO on 16/03/2024.
  */
 
-private const val MAX_SMALL_INLINE_BANNER_HEIGHT = 50
+const val MAX_SMALL_INLINE_BANNER_HEIGHT = 50
 fun getAdRequest(): AdRequest {
     val builder = AdRequest.Builder()
     return builder.build()
@@ -43,11 +44,13 @@ fun getAdSize(
     // Step 3 - Get adaptive ad size and return for setting on the ad view.
     return if (useInlineAdaptive) {
         if (inlineStyle == BannerInlineStyle.LARGE_STYLE) {
+            Log.e("TAG", "getAdSize: 2121", )
             AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(
                 mActivity,
                 adWidth
             )
         } else {
+            Log.e("TAG", "getAdSize: ", )
             AdSize.getInlineAdaptiveBannerAdSize(
                 adWidth,
                 MAX_SMALL_INLINE_BANNER_HEIGHT

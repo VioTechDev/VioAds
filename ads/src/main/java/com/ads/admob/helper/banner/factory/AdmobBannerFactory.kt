@@ -1,6 +1,7 @@
 package com.ads.admob.helper.banner.factory
 
 import android.content.Context
+import com.ads.admob.BannerInlineStyle
 import com.ads.admob.listener.BannerAdCallBack
 
 /**
@@ -8,7 +9,14 @@ import com.ads.admob.listener.BannerAdCallBack
  */
 
 interface AdmobBannerFactory {
-    fun requestBannerAd(context: Context, adId: String, collapsibleGravity: String? = null, adCallback: BannerAdCallBack)
+    fun requestBannerAd(
+        context: Context,
+        adId: String,
+        collapsibleGravity: String? = null,
+        bannerInlineStyle: Int = BannerInlineStyle.SMALL_STYLE,
+        useInlineAdaptive: Boolean,
+        adCallback: BannerAdCallBack
+    )
 
     companion object {
         @JvmStatic

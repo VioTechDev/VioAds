@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
+import com.ads.admob.BannerInlineStyle
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.nativead.NativeAd
@@ -24,6 +25,8 @@ interface AdmobFactory {
         context: Context,
         adId: String,
         collapsibleGravity: String? = null,
+        bannerInlineStyle: Int = BannerInlineStyle.SMALL_STYLE,
+        useInlineAdaptive: Boolean = false,
         adCallback: BannerAdCallBack
     )
 
