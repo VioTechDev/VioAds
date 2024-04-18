@@ -190,6 +190,10 @@ class RewardAdHelper(
                 invokeAdListener { it.onAdClose() }
             }
 
+            override fun onRewardShow() {
+                AdmobManager.adsShowFullScreen()
+            }
+
             override fun onUserEarnedReward(rewardItem: RewardItem?) {
                 Log.d(TAG, "onUserEarnedReward: ")
             }

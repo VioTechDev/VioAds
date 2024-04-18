@@ -2,6 +2,7 @@ package com.ads.admob.helper.reward.factory
 
 import android.app.Activity
 import android.content.Context
+import com.ads.admob.AdmobManager
 import com.ads.admob.data.ContentAd
 import com.ads.admob.getAdRequest
 import com.ads.admob.listener.RewardAdCallBack
@@ -52,12 +53,18 @@ class AdmobRewardAdFactoryImpl : AdmobRewardAdFactory {
 
             override fun onAdShowedFullScreenContent() {
                 super.onAdShowedFullScreenContent()
-                adCallback.onAdImpression()
+                adCallback.onRewardShow()
             }
 
             override fun onAdClicked() {
                 super.onAdClicked()
+                AdmobManager.adsClicked()
                 adCallback.onAdClicked()
+            }
+
+            override fun onAdImpression() {
+                super.onAdImpression()
+                adCallback.onAdImpression()
             }
         }
         rewardedAd.show(activity) { rewardItem ->
