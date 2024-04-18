@@ -1,21 +1,29 @@
-package com.example.andmoduleads.activity;
+package com.example.andmoduleads.activity
 
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.ads.admob.helper.reward.RewardAdConfig
+import com.ads.admob.helper.reward.RewardAdHelper
+import com.ads.admob.helper.reward.params.RewardAdParam
+import com.example.andmoduleads.databinding.ActivityMainBinding
 
-import androidx.appcompat.app.AppCompatActivity;
+class MainActivity : AppCompatActivity() {
+    private var binding: ActivityMainBinding? = null
+    protected var isBackgroundRunning = false
+    private val rewardAdHelper by lazy {
+        val rewardAdConfig = RewardAdConfig("ca-app-pub-3940256099942544/5224354917", 1, true, true)
+        RewardAdHelper(
+            this, this, rewardAdConfig
+        )
+    }
 
-import com.example.andmoduleads.databinding.ActivityMainBinding;
-
-public class MainActivity extends AppCompatActivity {
-
-    private ActivityMainBinding binding;
-    protected boolean isBackgroundRunning = false;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding!!.root)
+        rewardAdHelper.requestAds(RewardAdParam.Request)
+        binding?.button3?.setOnClickListener {
+            rewardAdHelper.requestAds(RewardAdParam.ShowAd)
+        }
     }
 }

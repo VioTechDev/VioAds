@@ -1,5 +1,6 @@
 package com.ads.admob.admob
 
+import android.app.Activity
 import android.content.Context
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
@@ -10,6 +11,8 @@ import com.ads.admob.config.VioAdConfig
 import com.ads.admob.listener.BannerAdCallBack
 import com.ads.admob.listener.InterstitialAdCallback
 import com.ads.admob.listener.NativeAdCallback
+import com.ads.admob.listener.RewardAdCallBack
+import com.google.android.gms.ads.rewarded.RewardedAd
 
 /**
  * Created by ViO on 16/03/2024.
@@ -43,6 +46,12 @@ interface AdmobFactory {
         adCallback: InterstitialAdCallback
     )
 
+    fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack)
+    fun showRewardAd(
+        activity: Activity,
+        rewardedAd: RewardedAd,
+        adCallback: RewardAdCallBack
+    )
     companion object {
         @JvmStatic
         fun getInstance(): AdmobFactory = AdmobFactoryImpl()

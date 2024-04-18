@@ -1,5 +1,6 @@
 package com.ads.admob.admob
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Build
@@ -7,19 +8,22 @@ import android.util.Log
 import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.annotation.IntDef
+import com.ads.admob.config.VioAdConfig
+import com.ads.admob.helper.adnative.factory.AdmobNativeFactory
+import com.ads.admob.helper.banner.factory.AdmobBannerFactory
+import com.ads.admob.helper.interstitial.factory.AdmobInterstitialAdFactory
+import com.ads.admob.helper.reward.factory.AdmobRewardAdFactory
+import com.ads.admob.listener.BannerAdCallBack
+import com.ads.admob.listener.InterstitialAdCallback
+import com.ads.admob.listener.NativeAdCallback
+import com.ads.admob.listener.RewardAdCallBack
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.initialization.InitializationStatus
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.nativead.NativeAd
-import com.ads.admob.config.VioAdConfig
-import com.ads.admob.helper.adnative.factory.AdmobNativeFactory
-import com.ads.admob.helper.banner.factory.AdmobBannerFactory
-import com.ads.admob.helper.interstitial.factory.AdmobInterstitialAdFactory
-import com.ads.admob.listener.BannerAdCallBack
-import com.ads.admob.listener.InterstitialAdCallback
-import com.ads.admob.listener.NativeAdCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
 
 /**
  * Created by ViO on 16/03/2024.
@@ -106,6 +110,18 @@ class AdmobFactoryImpl : AdmobFactory {
     ) {
         AdmobInterstitialAdFactory.getInstance()
             .showInterstitial(context, interstitialAd, adCallback)
+    }
+
+    override fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack) {
+        AdmobRewardAdFactory.getInstance().requestRewardAd(context, adId, adCallback)
+    }
+
+    override fun showRewardAd(
+        activity: Activity,
+        rewardedAd: RewardedAd,
+        adCallback: RewardAdCallBack
+    ) {
+        AdmobRewardAdFactory.getInstance().showRewardAd(activity, rewardedAd, adCallback)
     }
 
     companion object {

@@ -74,3 +74,11 @@ annotation class BannerCollapsibleGravity {
         const val TOP = "top"
     }
 }
+
+@IntDef(RewardType.NORMAL, RewardType.INTERSTITIAL)
+annotation class RewardType {
+    companion object {
+        const val NORMAL = 0
+        const val INTERSTITIAL = 1
+    }
+}
