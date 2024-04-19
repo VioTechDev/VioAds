@@ -53,7 +53,11 @@ class AdmobNativeAdAdapter private constructor(private val mParam: NativeAdAdapt
 
     private fun isAdPosition(position: Int): Boolean {
         /*if(position==1|| position==4)return true;*/
-        return (position + 1) % (mParam.adItemInterval + 1) == 0
+        return if (mParam.adPosition != null) {
+            mParam.adPosition == position
+        } else {
+            (position + 1) % (mParam.adItemInterval + 1) == 0
+        }
     }
 
     private fun onBindAdViewHolder(holder: RecyclerView.ViewHolder) {
@@ -155,11 +159,17 @@ class AdmobNativeAdAdapter private constructor(private val mParam: NativeAdAdapt
             return this
         }
 
+        fun adPosition(position: Int): Builder {
+            mParam.adPosition = position
+            return this
+        }
+
         fun adLayout(@LayoutRes layoutContainerRes: Int, @IdRes itemContainerId: Int): Builder {
             mParam.itemContainerLayoutRes = layoutContainerRes
             mParam.itemContainerId = itemContainerId
             return this
         }
+
         fun adLayoutView(@LayoutRes layoutContainerRes: Int, @IdRes itemContainerId: Int): Builder {
             mParam.nativeContentView = layoutContainerRes
             mParam.itemContainerId = itemContainerId

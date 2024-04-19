@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             canShowAds = true,
             canReloadAds = true,
             bannerInlineStyle = BannerInlineStyle.LARGE_STYLE,
-            useInlineAdaptive = false
+            useInlineAdaptive = true
         )
         return BannerAdHelper(activity = this, lifecycleOwner = this, config = config)
     }
@@ -81,7 +81,8 @@ class MainActivity : AppCompatActivity() {
             "ca-app-pub-3940256099942544/2247696110",  //admob native ad id
             adapter,  //current adapter
             0 //Set the size "small", "medium" or "custom"
-        ).adItemInterval(5) //Repeat interval
+        ).adPosition(1)
+            .adItemInterval(5) //Repeat interval
             .adLayout(R.layout.native_exit1, 1)
             .adLayoutView(R.layout.item_native_ad, 1)
             .build()

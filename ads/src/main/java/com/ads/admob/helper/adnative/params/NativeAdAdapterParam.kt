@@ -1,6 +1,5 @@
 package com.ads.admob.helper.adnative.params
 
-import android.widget.FrameLayout
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.GridLayoutManager
@@ -13,6 +12,7 @@ class NativeAdAdapterParam {
     var adItemInterval = 0
     var forceReloadAdOnBind = false
     var layout = 0
+    var adPosition: Int? = null
 
     @LayoutRes
     var itemContainerLayoutRes = 0
