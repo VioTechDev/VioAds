@@ -2,9 +2,11 @@ package com.example.andmoduleads.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ads.admob.BannerInlineStyle
+import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.adnative.AdmobNativeAdAdapter
 import com.ads.admob.helper.banner.BannerAdConfig
 import com.ads.admob.helper.banner.BannerAdHelper
@@ -12,10 +14,14 @@ import com.ads.admob.helper.banner.params.BannerAdParam
 import com.ads.admob.helper.reward.RewardAdConfig
 import com.ads.admob.helper.reward.RewardAdHelper
 import com.ads.admob.helper.reward.params.RewardAdParam
+import com.ads.admob.listener.RewardAdCallBack
 import com.example.andmoduleads.Contact
 import com.example.andmoduleads.ContactsAdapter
 import com.example.andmoduleads.R
 import com.example.andmoduleads.databinding.ActivityMainBinding
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.rewarded.RewardItem
 
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
@@ -26,7 +32,9 @@ class MainActivity : AppCompatActivity() {
         val rewardAdConfig = RewardAdConfig("ca-app-pub-3940256099942544/5224354917", 1, true, true)
         RewardAdHelper(
             this, this, rewardAdConfig
-        )
+        ).apply {
+
+        }
     }
 
     private val bannerAdHelper by lazy { initBannerAd() }
@@ -47,6 +55,35 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
         rewardAdHelper.requestAds(RewardAdParam.Request)
+            rewardAdHelper.registerAdListener(object  : RewardAdCallBack{
+                override fun onAdClose() {
+                    rewardAdHelper.requestAds(RewardAdParam.Request)
+                }
+
+                override fun onUserEarnedReward(rewardItem: RewardItem?) {
+                }
+
+                override fun onRewardShow() {
+                }
+
+                override fun onAdLoaded(data: ContentAd.AdmobAd.ApRewardAd) {
+                }
+
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    Log.e("TAG", "onAdFailedToLoad: ", )
+                }
+
+                override fun onAdClicked() {
+                }
+
+                override fun onAdImpression() {
+                }
+
+                override fun onAdFailedToShow(adError: AdError) {
+                    Log.e("TAG", "onAdFailedToShow: ", )
+                }
+
+            })
         binding?.button3?.setOnClickListener {
             rewardAdHelper.requestAds(RewardAdParam.ShowAd)
         }
