@@ -76,7 +76,7 @@ class RewardAdHelper(
         if (config.showByTime != 1) {
             requestShowCount++
         }
-        if (requestShowCount % config.showByTime == 0 && rewardAdValue != null) {
+        if (requestShowCount % config.showByTime == 0 && rewardAdValue != null && adRewardState.value == AdRewardState.Loaded) {
             lifecycleOwner.lifecycleScope.launch {
                 AdmobManager.adsShowFullScreen()
                 showDialogLoading()
@@ -96,10 +96,10 @@ class RewardAdHelper(
             }
             && adRewardState.value != AdRewardState.Loading
         ) {
-            invokeAdListener { it.onAdClose() }
+            invokeAdListener { it.onAdFailedToShow(AdError(1, "Ads Empty", "" )) }
             requestAds(RewardAdParam.Request)
         } else {
-            invokeAdListener { it.onAdClose() }
+            invokeAdListener { it.onAdFailedToShow(AdError(1, "Ads Empty", "" )) }
         }
     }
 
@@ -123,6 +123,7 @@ class RewardAdHelper(
         if (requestValid()) {
             lifecycleOwner.lifecycleScope.launch {
                 adRewardState.emit(AdRewardState.Loading)
+                Log.e(TAG, "createInterAds: ", )
                 AdmobFactory.getInstance()
                     .requestRewardAd(
                         activity,
@@ -191,6 +192,9 @@ class RewardAdHelper(
             }
 
             override fun onRewardShow() {
+                lifecycleOwner.lifecycleScope.launch {
+                    adRewardState.emit(AdRewardState.Showed)
+                }
                 AdmobManager.adsShowFullScreen()
             }
 
