@@ -10,7 +10,8 @@ class VioAdConfig private constructor(
     val isVariantProduce: Boolean = false,
     val provider: Int = NetworkProvider.ADMOB,
     val listDevices: List<String> = arrayListOf(),
-    val disableAdsResumeByAd: Boolean = true
+    val disableAdsResumeByAd: Boolean = true,
+    val vioAdjustConfig: VioAdjustConfig
 ) {
 
     class Builder(
@@ -18,7 +19,8 @@ class VioAdConfig private constructor(
         private var isBuildVariantProduce: Boolean = false,
         private var mediationProvider: Int = NetworkProvider.ADMOB,
         private var listTestDevices: List<String> = arrayListOf(),
-        private var disableAdsResumeByAd: Boolean = true
+        private var disableAdsResumeByAd: Boolean = true,
+        private var vioAdjustConfig: VioAdjustConfig
     ) {
         fun application(application: Application) = apply { this.application = application }
 
@@ -39,7 +41,8 @@ class VioAdConfig private constructor(
                 isBuildVariantProduce,
                 mediationProvider,
                 listTestDevices,
-                disableAdsResumeByAd
+                disableAdsResumeByAd,
+                vioAdjustConfig
             )
     }
 }

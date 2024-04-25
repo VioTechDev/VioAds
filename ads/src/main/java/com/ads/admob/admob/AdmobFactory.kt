@@ -1,6 +1,7 @@
 package com.ads.admob.admob
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
@@ -19,7 +20,7 @@ import com.google.android.gms.ads.rewarded.RewardedAd
  * Created by ViO on 16/03/2024.
  */
 interface AdmobFactory {
-    fun initAdmob(context: Context, vioAdConfig: VioAdConfig)
+    fun initAdmob(context: Application, vioAdConfig: VioAdConfig)
 
     fun requestBannerAd(
         context: Context,

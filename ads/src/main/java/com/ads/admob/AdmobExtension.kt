@@ -44,13 +44,13 @@ fun getAdSize(
     // Step 3 - Get adaptive ad size and return for setting on the ad view.
     return if (useInlineAdaptive) {
         if (inlineStyle == BannerInlineStyle.LARGE_STYLE) {
-            Log.e("TAG", "getAdSize: 2121", )
+            Log.e("TAG", "getAdSize: 2121")
             AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(
                 mActivity,
                 adWidth
             )
         } else {
-            Log.e("TAG", "getAdSize: ", )
+            Log.e("TAG", "getAdSize: ")
             AdSize.getInlineAdaptiveBannerAdSize(
                 adWidth,
                 MAX_SMALL_INLINE_BANNER_HEIGHT

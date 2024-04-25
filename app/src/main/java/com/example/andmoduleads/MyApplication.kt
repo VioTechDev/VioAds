@@ -2,6 +2,10 @@ package com.example.andmoduleads
 
 import android.app.Application
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.ads.admob.admob.AdmobFactory
+import com.ads.admob.config.NetworkProvider
+import com.ads.admob.config.VioAdConfig
+import com.ads.admob.config.VioAdjustConfig
 import com.ads.admob.helper.appoppen.AppResumeAdConfig
 import com.ads.admob.helper.appoppen.AppResumeAdHelper
 import com.example.andmoduleads.activity.SplashActivity
@@ -34,6 +38,13 @@ class MyApplication : Application() {
         super.onCreate()
         application = this
         initAppOpenAd().setRequestAppResumeValid(false)
+        val vioAdjustConfig = VioAdjustConfig.Build("").build()
+        val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
+            .buildVariantProduce(false)
+            .mediationProvider(NetworkProvider.ADMOB)
+            .listTestDevices(ArrayList())
+            .build()
+        AdmobFactory.getInstance().initAdmob(this, vioAdConfig)
     }
 
     companion object {
