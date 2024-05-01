@@ -6,6 +6,7 @@ import android.util.Log
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
+import com.ads.admob.AdmobManager
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdapterResponseInfo
@@ -75,7 +76,8 @@ class AppOpenAdManager {
                             }
                             Adjust.trackAdRevenue(adRevenue)
                         }
-                    }catch (e:Exception){}
+                    }catch (_:Exception){}
+
 
                 }
 
