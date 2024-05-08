@@ -5,13 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.annotation.IdRes
-import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.adnative.factory.AdmobNativeFactory
-import com.ads.admob.helper.adnative.params.NativeAdAdapterParam
 import com.ads.admob.listener.NativeAdCallback
 import com.ads.admob.widget.RecyclerViewAdapterWrapper
 import com.ads.control.R
@@ -20,29 +17,27 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
 
 
-class AdmobNativeAdAdapter private constructor(private val mParam: NativeAdAdapterParam) :
-    RecyclerViewAdapterWrapper(mParam.adapter!!) {
+class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig) :
+    RecyclerViewAdapterWrapper(nativeAdapterConfig.adapter) {
     init {
-        assertConfig()
         setSpanAds()
+        //assertConfig()
     }
 
     private fun assertConfig() {
-        if (mParam.gridLayoutManager != null) {
-            //if user set span ads
-            val nCol = mParam.gridLayoutManager!!.spanCount
-            require(mParam.adItemInterval % nCol == 0) {
-                String.format(
-                    "The adItemInterval (%d) is not divisible by number of columns in GridLayoutManager (%d)",
-                    mParam.adItemInterval,
-                    nCol
-                )
-            }
+        //if user set span ads
+        val nCol: Int = nativeAdapterConfig.gridLayoutManager.spanCount
+        require(nativeAdapterConfig.adItemInterval % nCol == 0) {
+            String.format(
+                "The adItemInterval (%d) is not divisible by number of columns in GridLayoutManager (%d)",
+                nativeAdapterConfig.adItemInterval,
+                nCol
+            )
         }
     }
 
     private fun convertAdPosition2OrgPosition(position: Int): Int {
-        return position - (position + 1) / (mParam.adItemInterval + 1)
+        return position - (position + (nativeAdapterConfig.adItemInterval - nativeAdapterConfig.firstPositionNativeApp)) / (nativeAdapterConfig.adItemInterval + 1)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -52,20 +47,28 @@ class AdmobNativeAdAdapter private constructor(private val mParam: NativeAdAdapt
     }
 
     private fun isAdPosition(position: Int): Boolean {
-        /*if(position==1|| position==4)return true;*/
-        return if (mParam.adPosition != null) {
-            mParam.adPosition == position
+        return if (nativeAdapterConfig.isRepeat) {
+            if (position <= nativeAdapterConfig.firstPositionNativeApp) {
+                position == nativeAdapterConfig.firstPositionNativeApp
+            } else {
+                (position - nativeAdapterConfig.firstPositionNativeApp) % (nativeAdapterConfig.adItemInterval + 1) == 0
+            }
         } else {
-            (position + 1) % (mParam.adItemInterval + 1) == 0
+            position == nativeAdapterConfig.firstPositionNativeApp
         }
+    }
+
+    override fun getItemCount(): Int {
+        val realCount = super.getItemCount()
+        return realCount + realCount / nativeAdapterConfig.adItemInterval
     }
 
     private fun onBindAdViewHolder(holder: RecyclerView.ViewHolder) {
         val adHolder = holder as AdViewHolder
-        if (mParam.forceReloadAdOnBind || !adHolder.loaded) {
+        if (nativeAdapterConfig.forceReloadAdOnBind || !adHolder.loaded) {
             AdmobNativeFactory.getInstance().requestNativeAd(
                 holder.itemView.context,
-                mParam.admobNativeId,
+                nativeAdapterConfig.nativeAdId,
                 object : NativeAdCallback {
                     override fun populateNativeAd() {
 
@@ -75,7 +78,7 @@ class AdmobNativeAdAdapter private constructor(private val mParam: NativeAdAdapt
                         AdmobNativeFactory.getInstance().populateNativeAdView(
                             holder.itemView.context,
                             data.nativeAd,
-                            mParam.itemContainerLayoutRes,
+                            nativeAdapterConfig.nativeContentView,
                             holder.nativeContentView,
                             holder.shimmerLayoutView,
                             object : NativeAdCallback {
@@ -128,7 +131,7 @@ class AdmobNativeAdAdapter private constructor(private val mParam: NativeAdAdapt
     private fun onCreateAdViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val adLayoutOutline = inflater
-            .inflate(mParam.nativeContentView, parent, false)
+            .inflate(nativeAdapterConfig.itemNativeAd, parent, false)
         return AdViewHolder(adLayoutOutline)
     }
 
@@ -139,84 +142,18 @@ class AdmobNativeAdAdapter private constructor(private val mParam: NativeAdAdapt
     }
 
     private fun setSpanAds() {
-        if (mParam.gridLayoutManager == null) {
-            return
-        }
-        val spl = mParam.gridLayoutManager!!.spanSizeLookup
-        mParam.gridLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if (isAdPosition(position)) {
-                    spl.getSpanSize(position)
-                } else 1
+        val spl = nativeAdapterConfig.gridLayoutManager.spanSizeLookup
+        nativeAdapterConfig.gridLayoutManager.spanSizeLookup =
+            object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return if (isAdPosition(position)) {
+                        spl.getSpanSize(position)
+                    } else 1
+                }
             }
-        }
     }
 
-
-    class Builder private constructor(private val mParam: NativeAdAdapterParam) {
-        fun adItemInterval(interval: Int): Builder {
-            mParam.adItemInterval = interval
-            return this
-        }
-
-        fun adPosition(position: Int): Builder {
-            mParam.adPosition = position
-            return this
-        }
-
-        fun adLayout(@LayoutRes layoutContainerRes: Int, @IdRes itemContainerId: Int): Builder {
-            mParam.itemContainerLayoutRes = layoutContainerRes
-            mParam.itemContainerId = itemContainerId
-            return this
-        }
-
-        fun adLayoutView(@LayoutRes layoutContainerRes: Int, @IdRes itemContainerId: Int): Builder {
-            mParam.nativeContentView = layoutContainerRes
-            mParam.itemContainerId = itemContainerId
-            return this
-        }
-
-        fun build(): AdmobNativeAdAdapter {
-            return AdmobNativeAdAdapter(mParam)
-        }
-
-        fun enableSpanRow(layoutManager: GridLayoutManager?): Builder {
-            mParam.gridLayoutManager = layoutManager
-            return this
-        }
-
-        fun adItemIterval(i: Int): Builder {
-            mParam.adItemInterval = i
-            return this
-        }
-
-        fun forceReloadAdOnBind(forced: Boolean): Builder {
-            mParam.forceReloadAdOnBind = forced
-            return this
-        }
-
-        companion object {
-            fun with(
-                placementId: String = "",
-                wrapped: RecyclerView.Adapter<*>?,
-                layout: Int
-            ): Builder {
-                val param = NativeAdAdapterParam()
-                param.admobNativeId = placementId
-                param.adapter = wrapped as RecyclerView.Adapter<RecyclerView.ViewHolder>
-                param.layout = layout
-
-                //default value
-                param.adItemInterval = DEFAULT_AD_ITEM_INTERVAL
-                param.itemContainerLayoutRes = R.layout.item_admob_native_ad_outline
-                param.itemContainerId = R.id.ad_container
-                param.forceReloadAdOnBind = true
-                return Builder(param)
-            }
-        }
-    }
-
-    private class AdViewHolder internal constructor(view: View) : RecyclerView.ViewHolder(view) {
+    private class AdViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var loaded = false
         var shimmerLayoutView: ShimmerFrameLayout
         var nativeContentView: FrameLayout

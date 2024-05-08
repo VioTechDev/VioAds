@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ads.admob.BannerInlineStyle
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.adnative.AdmobNativeAdAdapter
+import com.ads.admob.helper.adnative.NativeAdapterConfig
 import com.ads.admob.helper.banner.BannerAdConfig
 import com.ads.admob.helper.banner.BannerAdHelper
 import com.ads.admob.helper.banner.params.BannerAdParam
@@ -109,20 +111,38 @@ class MainActivity : AppCompatActivity() {
         // Create adapter passing in the sample user data
 
         // Create adapter passing in the sample user data
-        val adapter = ContactsAdapter(contacts)
+        val cats: List<Contact> = List(20/4) {
+            Log.e("TAG", "onCreate: $it", )
+            Contact("vinhvh $it",true)
+        }
 
         //Build the native adapter from the current adapter
 
         //Build the native adapter from the current adapter
-        val admobNativeAdAdapter: AdmobNativeAdAdapter = AdmobNativeAdAdapter.Builder.with(
-            "ca-app-pub-3940256099942544/2247696110",  //admob native ad id
-            adapter,  //current adapter
-            0 //Set the size "small", "medium" or "custom"
-        ).adPosition(1)
-            .adItemInterval(5) //Repeat interval
-            .adLayout(R.layout.native_exit1, 1)
-            .adLayoutView(R.layout.item_native_ad, 1)
-            .build()
+
+        val listData = contacts?.chunked(20/4)?.mapIndexed { index, contacts ->
+            Log.e("TAG", "onCreate: ", )
+            contacts.toMutableList().apply {
+                add(1, cats[index]) }
+        }?.flatten()
+        val adapter = contacts?.let { ContactsAdapter(it) }
+
+
+        val gridLayoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
+        val nativeAdapterConfig = adapter?.let {
+            NativeAdapterConfig.Builder(
+                "ca-app-pub-3940256099942544/2247696110",
+                it,
+                R.layout.item_native_ad,
+                R.layout.native_exit1,
+                1,
+                gridLayoutManager,
+                2,
+                false,
+                false
+            ).build()
+        }
+        val admobNativeAdAdapter = nativeAdapterConfig?.let { AdmobNativeAdAdapter(it) }
 
 
         // Attach the new adapter to the recyclerview to populate items

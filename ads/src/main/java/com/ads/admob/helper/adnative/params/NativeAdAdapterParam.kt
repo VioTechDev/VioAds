@@ -20,6 +20,6 @@ class NativeAdAdapterParam {
     @IdRes
     var itemContainerId = 0
     var gridLayoutManager: GridLayoutManager? = null
-    var shimmerLayoutView: ShimmerFrameLayout? = null
+    @LayoutRes
     var nativeContentView = 0
 }
