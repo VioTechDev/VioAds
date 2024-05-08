@@ -37,13 +37,19 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
     }
 
     private fun convertAdPosition2OrgPosition(position: Int): Int {
-        return position - (position + (nativeAdapterConfig.adItemInterval - nativeAdapterConfig.firstPositionNativeApp)) / (nativeAdapterConfig.adItemInterval + 1)
+        return if (nativeAdapterConfig.isRepeat) {
+            position - (position + (nativeAdapterConfig.adItemInterval - nativeAdapterConfig.firstPositionNativeApp)) / (nativeAdapterConfig.adItemInterval + 1)
+        } else {
+            (position) - (nativeAdapterConfig.firstPositionNativeApp + position) / (nativeAdapterConfig.adapter.itemCount + 1)
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
         return if (isAdPosition(position)) {
             TYPE_FB_NATIVE_ADS
-        } else super.getItemViewType(convertAdPosition2OrgPosition(position))
+        } else super.getItemViewType(
+            convertAdPosition2OrgPosition(position)
+        )
     }
 
     private fun isAdPosition(position: Int): Boolean {
@@ -60,7 +66,11 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
 
     override fun getItemCount(): Int {
         val realCount = super.getItemCount()
-        return realCount + realCount / nativeAdapterConfig.adItemInterval
+        return if (nativeAdapterConfig.isRepeat) {
+            realCount + realCount / nativeAdapterConfig.adItemInterval
+        } else {
+            realCount
+        }
     }
 
     private fun onBindAdViewHolder(holder: RecyclerView.ViewHolder) {

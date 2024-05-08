@@ -137,8 +137,8 @@ class MainActivity : AppCompatActivity() {
                 R.layout.native_exit1,
                 1,
                 gridLayoutManager,
-                2,
-                false,
+                4,
+                true,
                 false
             ).build()
         }
