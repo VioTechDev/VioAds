@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private val bannerAdHelper by lazy { initBannerAd() }
     private fun initBannerAd(): BannerAdHelper {
         val config = BannerAdConfig(
-            idAds = "ca-app-pub-3940256099942544/6300978111",
+            idAds = "ca-app-pub-4584260126367940/4345254018",
             canShowAds = true,
             canReloadAds = true,
             bannerInlineStyle = BannerInlineStyle.LARGE_STYLE,
@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
         val nativeAdapterConfig = adapter?.let {
             NativeAdapterConfig.Builder(
-                "ca-app-pub-3940256099942544/2247696110",
+                "ca-app-pub-4584260126367940/2523808402",
                 it,
                 R.layout.item_native_ad,
                 R.layout.native_exit1,

@@ -2,6 +2,7 @@ package com.example.andmoduleads
 
 import android.app.Application
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.adjust.sdk.AdjustConfig
 import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.config.NetworkProvider
 import com.ads.admob.config.VioAdConfig
@@ -10,6 +11,7 @@ import com.ads.admob.helper.appoppen.AppResumeAdConfig
 import com.ads.admob.helper.appoppen.AppResumeAdHelper
 import com.example.andmoduleads.activity.SplashActivity
 import com.google.android.gms.ads.AdActivity
+
 
 class MyApplication : Application() {
     private val APPSFLYER_TOKEN = "2PUNpdyDTkedZTgeKkWCyB"
@@ -38,7 +40,7 @@ class MyApplication : Application() {
         super.onCreate()
         application = this
         initAppOpenAd().setRequestAppResumeValid(false)
-        val vioAdjustConfig = VioAdjustConfig.Build("").build()
+        val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  AdjustConfig.ENVIRONMENT_SANDBOX).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
             .mediationProvider(NetworkProvider.ADMOB)
@@ -46,7 +48,6 @@ class MyApplication : Application() {
             .build()
         AdmobFactory.getInstance().initAdmob(this, vioAdConfig)
     }
-
     companion object {
         var application: MyApplication? = null
             private set

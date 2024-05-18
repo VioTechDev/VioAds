@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import android.webkit.WebView
 import android.widget.FrameLayout
@@ -71,10 +72,9 @@ class AdmobFactoryImpl : AdmobFactory {
         )
     }
 
-    private fun setupAdjust(context: Application, adjustConfig: VioAdjustConfig) {
-        val environment = AdjustConfig.ENVIRONMENT_PRODUCTION
-        Log.i("Application", "setupAdjust: $environment")
-        val config = AdjustConfig(context, adjustConfig.adjustToken, environment)
+    private fun setupAdjust(application: Application, adjustConfig: VioAdjustConfig) {
+        Log.i("Application", "setupAdjust: ${adjustConfig.environment}")
+        val config = AdjustConfig(application, adjustConfig.adjustToken, adjustConfig.environment)
 
         // Change the log level.
         config.setLogLevel(LogLevel.VERBOSE)
@@ -124,9 +124,37 @@ class AdmobFactoryImpl : AdmobFactory {
                 "Session failure data: $sessionFailureResponseData"
             )
         }
+        application.registerActivityLifecycleCallbacks(AdjustLifecycleCallbacks())
         config.setSendInBackground(true)
         Adjust.onCreate(config)
+        Log.e(TAG, "setupAdjustSuccess:  ${config.isValid}", )
     }
+
+    private class AdjustLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
+        override fun onActivityResumed(activity: Activity) {
+            Adjust.onResume()
+        }
+
+        override fun onActivityPaused(activity: Activity) {
+            Adjust.onPause()
+        }
+
+        override fun onActivityStopped(activity: Activity) {
+        }
+
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+        }
+
+        override fun onActivityDestroyed(activity: Activity) {
+        }
+
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        }
+
+        override fun onActivityStarted(activity: Activity) {
+        }
+    }
+
 
     override fun requestBannerAd(
         context: Context,
