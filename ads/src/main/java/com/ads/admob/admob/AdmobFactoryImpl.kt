@@ -73,8 +73,14 @@ class AdmobFactoryImpl : AdmobFactory {
     }
 
     private fun setupAdjust(application: Application, adjustConfig: VioAdjustConfig) {
-        Log.i("Application", "setupAdjust: ${adjustConfig.environment}")
-        val config = AdjustConfig(application, adjustConfig.adjustToken, adjustConfig.environment)
+        val environment = if (adjustConfig.environmentProduct) {
+            AdjustConfig.ENVIRONMENT_PRODUCTION
+        } else {
+            AdjustConfig.ENVIRONMENT_SANDBOX
+        }
+        Log.i("Application", "setupAdjust: ${environment}")
+
+        val config = AdjustConfig(application, adjustConfig.adjustToken, environment)
 
         // Change the log level.
         config.setLogLevel(LogLevel.VERBOSE)

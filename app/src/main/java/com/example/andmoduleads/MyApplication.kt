@@ -40,7 +40,7 @@ class MyApplication : Application() {
         super.onCreate()
         application = this
         initAppOpenAd().setRequestAppResumeValid(false)
-        val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  AdjustConfig.ENVIRONMENT_SANDBOX).build()
+        val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  false).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
             .mediationProvider(NetworkProvider.ADMOB)
