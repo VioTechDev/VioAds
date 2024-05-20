@@ -4,12 +4,19 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ads.admob.BannerInlineStyle
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.adnative.AdmobNativeAdAdapter
+import com.ads.admob.helper.adnative.NativeAdConfig
+import com.ads.admob.helper.adnative.NativeAdHelper
 import com.ads.admob.helper.adnative.NativeAdapterConfig
+import com.ads.admob.helper.adnative.params.AdNativeMediation
+import com.ads.admob.helper.adnative.params.NativeAdParam
+import com.ads.admob.helper.adnative.params.NativeLayoutMediation
 import com.ads.admob.helper.banner.BannerAdConfig
 import com.ads.admob.helper.banner.BannerAdHelper
 import com.ads.admob.helper.banner.params.BannerAdParam
@@ -23,6 +30,7 @@ import com.example.andmoduleads.R
 import com.example.andmoduleads.databinding.ActivityMainBinding
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.rewarded.RewardItem
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +42,22 @@ class MainActivity : AppCompatActivity() {
         val rewardAdConfig = RewardAdConfig("ca-app-pub-3940256099942544/5224354917", 1, true, true)
         RewardAdHelper(
             this, this, rewardAdConfig
+        ).apply {
+
+        }
+    }
+    private val nativeAdHelper by lazy {
+        val config = NativeAdConfig(
+            "ca-app-pub-4584260126367940/7901355648",
+            true,
+            true,
+           R.layout.native_exit1
+        )
+
+        NativeAdHelper(
+            this,
+            this,
+            config
         ).apply {
 
         }
@@ -56,6 +80,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
+        binding?.frAds?.let { nativeAdHelper.setNativeContentView(it) }
+        binding?.shimmerBanner?.shimmerContainerNative?.let { nativeAdHelper.setShimmerLayoutView(it) }
+        nativeAdHelper.requestAds(NativeAdParam.Request)
         rewardAdHelper.requestAds(RewardAdParam.Request)
             rewardAdHelper.registerAdListener(object  : RewardAdCallBack{
                 override fun onAdClose() {
@@ -87,12 +114,13 @@ class MainActivity : AppCompatActivity() {
 
             })
         binding?.button3?.setOnClickListener {
-            rewardAdHelper.requestAds(RewardAdParam.ShowAd)
+            MobileAds.openAdInspector(this) { error ->
+                // Error will be non-null if ad inspector closed due to an error.
+            }
         }
         binding?.frAds?.let {
             bannerAdHelper.setBannerContentView(it)
         }
-        binding?.shimmerBanner?.shimmerContainerBanner?.let { bannerAdHelper.setShimmerLayoutView(it) }
         if (bannerAdHelper.bannerAdView == null) {
             bannerAdHelper.requestAds(BannerAdParam.Request)
         }
@@ -126,35 +154,35 @@ class MainActivity : AppCompatActivity() {
                 add(1, cats[index]) }
         }?.flatten()
         val adapter = contacts?.let { ContactsAdapter(it) }
-
-
-        val gridLayoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
-        val nativeAdapterConfig = adapter?.let {
-            NativeAdapterConfig.Builder(
-                "ca-app-pub-4584260126367940/2523808402",
-                it,
-                R.layout.item_native_ad,
-                R.layout.native_exit1,
-                1,
-                gridLayoutManager,
-                4,
-                true,
-                false
-            ).build()
-        }
-        val admobNativeAdAdapter = nativeAdapterConfig?.let { AdmobNativeAdAdapter(it) }
-
-
-        // Attach the new adapter to the recyclerview to populate items
-
-
-        // Attach the new adapter to the recyclerview to populate items
-        binding?.rvContacts?.adapter = admobNativeAdAdapter
-
-        // Set layout manager to position the items
-
-        // Set layout manager to position the items
-        binding?.rvContacts?.layoutManager = LinearLayoutManager(this)
+//
+//
+//        val gridLayoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
+//        val nativeAdapterConfig = adapter?.let {
+//            NativeAdapterConfig.Builder(
+//                "ca-app-pub-4584260126367940/2523808402",
+//                it,
+//                R.layout.item_native_ad,
+//                R.layout.native_exit1,
+//                1,
+//                gridLayoutManager,
+//                4,
+//                true,
+//                false
+//            ).build()
+//        }
+//        val admobNativeAdAdapter = nativeAdapterConfig?.let { AdmobNativeAdAdapter(it) }
+//
+//
+//        // Attach the new adapter to the recyclerview to populate items
+//
+//
+//        // Attach the new adapter to the recyclerview to populate items
+//        binding?.rvContacts?.adapter = admobNativeAdAdapter
+//
+//        // Set layout manager to position the items
+//
+//        // Set layout manager to position the items
+//        binding?.rvContacts?.layoutManager = LinearLayoutManager(this)
     }
 
 }
