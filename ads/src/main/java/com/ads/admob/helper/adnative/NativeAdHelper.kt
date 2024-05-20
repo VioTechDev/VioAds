@@ -120,7 +120,7 @@ class NativeAdHelper(
                     AdmobFactory.getInstance().populateNativeAdView(
                         activity,
                         adsParam.adNative,
-                        config.layoutId,
+                        config.getLayoutIdByMediationNativeAd(adsParam.adNative),
                         nativeContentView!!,
                         shimmerLayoutView,
                         invokeListenerAdCallback()

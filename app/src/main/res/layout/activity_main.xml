@@ -34,7 +34,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <include android:id="@+id/shimmerBanner"
-                layout="@layout/layout_banner_control" />
+                layout="@layout/loading_native_medium" />
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
