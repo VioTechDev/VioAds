@@ -4,18 +4,16 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.LoadAdError
 import com.ads.admob.AdmobManager
 import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.data.ContentAd
 import com.ads.admob.dialog.LoadingAdsDialog
 import com.ads.admob.helper.AdsHelper
-import com.ads.admob.helper.interstitial.params.InterstitialAdParam
 import com.ads.admob.helper.reward.params.AdRewardState
 import com.ads.admob.helper.reward.params.RewardAdParam
-import com.ads.admob.listener.InterstitialAdCallback
 import com.ads.admob.listener.RewardAdCallBack
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import kotlinx.coroutines.Job
@@ -23,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
+
 /**
  * Created by ViO on 16/03/2024.
  */
@@ -115,7 +114,10 @@ class RewardAdHelper(
                     config.showByTime - 1
                 })
         val valueValid =
-            (rewardAdValue == null && adRewardState.value != AdRewardState.Loading) || adRewardState.value == AdRewardState.Showed
+            (rewardAdValue == null
+                    && (adRewardState.value != AdRewardState.Loading && adRewardState.value != AdRewardState.Loaded)
+                    )
+                    || adRewardState.value == AdRewardState.Showed
         return canRequestAds() && showConfigValid && valueValid
     }
 
@@ -123,7 +125,7 @@ class RewardAdHelper(
         if (requestValid()) {
             lifecycleOwner.lifecycleScope.launch {
                 adRewardState.emit(AdRewardState.Loading)
-                Log.e(TAG, "createInterAds: ", )
+               logZ("createRewardAds")
                 AdmobFactory.getInstance()
                     .requestRewardAd(
                         activity,
@@ -156,6 +158,7 @@ class RewardAdHelper(
     private fun invokeRewardAdCallback(): RewardAdCallBack {
         return object : RewardAdCallBack {
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                logZ("onAdFailedToLoad ${loadAdError.message}")
                 Log.e(TAG, "onAdFailedToLoad: $loadAdError", )
                 invokeAdListener { it.onAdFailedToLoad(loadAdError) }
                 lifecycleOwner.lifecycleScope.launch {
@@ -164,6 +167,7 @@ class RewardAdHelper(
             }
 
             override fun onAdLoaded(data: ContentAd.AdmobAd.ApRewardAd) {
+                logZ("onRewardLoad")
                 Log.d(TAG, "onRewardLoad: ")
                 rewardAdValue = data.rewardAd
                 lifecycleOwner.lifecycleScope.launch {
@@ -174,6 +178,7 @@ class RewardAdHelper(
 
 
             override fun onAdFailedToShow(adError: AdError) {
+                logZ("onAdFailedToShow ${adError.message}")
                 Log.e(TAG, "onAdFailedToShow: $adError", )
                 AdmobManager.adsFullScreenDismiss()
                 invokeAdListener { it.onAdClose() }
@@ -185,6 +190,7 @@ class RewardAdHelper(
             }
 
             override fun onAdClose() {
+                logZ("onAdClose")
                 AdmobManager.adsFullScreenDismiss()
                 dialogLoading.dismiss()
                 cancelLoadingJob()
@@ -192,6 +198,7 @@ class RewardAdHelper(
             }
 
             override fun onRewardShow() {
+                logZ("onRewardShow")
                 lifecycleOwner.lifecycleScope.launch {
                     adRewardState.emit(AdRewardState.Showed)
                 }
@@ -199,14 +206,17 @@ class RewardAdHelper(
             }
 
             override fun onUserEarnedReward(rewardItem: RewardItem?) {
+                logZ("onUserEarnedReward")
                 Log.d(TAG, "onUserEarnedReward: ")
             }
 
             override fun onAdClicked() {
+                logZ("onAdClicked")
                 invokeAdListener { it.onAdClicked() }
             }
 
             override fun onAdImpression() {
+                logZ("onAdImpression")
                 Log.d(TAG, "onAdImpression: ")
                 invokeAdListener { it.onAdImpression() }
             }

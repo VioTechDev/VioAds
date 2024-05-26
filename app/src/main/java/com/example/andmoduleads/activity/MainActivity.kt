@@ -4,22 +4,17 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
-import androidx.lifecycle.Lifecycle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.ads.admob.BannerInlineStyle
 import com.ads.admob.data.ContentAd
-import com.ads.admob.helper.adnative.AdmobNativeAdAdapter
 import com.ads.admob.helper.adnative.NativeAdConfig
 import com.ads.admob.helper.adnative.NativeAdHelper
-import com.ads.admob.helper.adnative.NativeAdapterConfig
-import com.ads.admob.helper.adnative.params.AdNativeMediation
 import com.ads.admob.helper.adnative.params.NativeAdParam
-import com.ads.admob.helper.adnative.params.NativeLayoutMediation
 import com.ads.admob.helper.banner.BannerAdConfig
 import com.ads.admob.helper.banner.BannerAdHelper
 import com.ads.admob.helper.banner.params.BannerAdParam
+import com.ads.admob.helper.interstitial.InterstitialAdConfig
+import com.ads.admob.helper.interstitial.InterstitialAdHelper
+import com.ads.admob.helper.interstitial.params.InterstitialAdParam
 import com.ads.admob.helper.reward.RewardAdConfig
 import com.ads.admob.helper.reward.RewardAdHelper
 import com.ads.admob.helper.reward.params.RewardAdParam
@@ -30,14 +25,27 @@ import com.example.andmoduleads.R
 import com.example.andmoduleads.databinding.ActivityMainBinding
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.rewarded.RewardItem
 
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     protected var isBackgroundRunning = false
     var contacts: java.util.ArrayList<Contact>? = null
+    val interAdHelper by lazy { initInterAdAd() }
 
+    private fun initInterAdAd(): InterstitialAdHelper {
+        val config = InterstitialAdConfig(
+            idAds = "ca-app-pub-3940256099942544/1033173712",
+            canShowAds = true,
+            canReloadAds = true,
+            showByTime = 1
+        )
+        return InterstitialAdHelper(
+            activity = this,
+            lifecycleOwner = this,
+            config = config
+        )
+    }
     private val rewardAdHelper by lazy {
         val rewardAdConfig = RewardAdConfig("ca-app-pub-3940256099942544/5224354917", 1, true, true)
         RewardAdHelper(
@@ -75,6 +83,10 @@ class MainActivity : AppCompatActivity() {
         return BannerAdHelper(activity = this, lifecycleOwner = this, config = config)
     }
 
+    override fun onResume() {
+        super.onResume()
+        interAdHelper.requestAds(InterstitialAdParam.Request)
+    }
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +96,8 @@ class MainActivity : AppCompatActivity() {
         binding?.shimmerBanner?.shimmerContainerNative?.let { nativeAdHelper.setShimmerLayoutView(it) }
         nativeAdHelper.requestAds(NativeAdParam.Request)
         rewardAdHelper.requestAds(RewardAdParam.Request)
-            rewardAdHelper.registerAdListener(object  : RewardAdCallBack{
+        interAdHelper.requestAds(InterstitialAdParam.Request)
+        rewardAdHelper.registerAdListener(object : RewardAdCallBack {
                 override fun onAdClose() {
                     rewardAdHelper.requestAds(RewardAdParam.Request)
                 }
@@ -114,9 +127,7 @@ class MainActivity : AppCompatActivity() {
 
             })
         binding?.button3?.setOnClickListener {
-            MobileAds.openAdInspector(this) { error ->
-                // Error will be non-null if ad inspector closed due to an error.
-            }
+            interAdHelper.requestAds(InterstitialAdParam.ShowAd)
         }
         binding?.frAds?.let {
             bannerAdHelper.setBannerContentView(it)

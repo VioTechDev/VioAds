@@ -1,12 +1,8 @@
 package com.ads.admob.helper.interstitial
 
 import android.app.Activity
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.ads.admob.AdmobManager
 import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.data.ContentAd
@@ -15,11 +11,15 @@ import com.ads.admob.helper.AdsHelper
 import com.ads.admob.helper.interstitial.params.AdInterstitialState
 import com.ads.admob.helper.interstitial.params.InterstitialAdParam
 import com.ads.admob.listener.InterstitialAdCallback
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
+
 /**
  * Created by ViO on 16/03/2024.
  */
@@ -73,7 +73,8 @@ class InterstitialAdHelper(
         if (config.showByTime != 1) {
             requestShowCount++
         }
-        if (requestShowCount % config.showByTime == 0 && interstitialAdValue != null) {
+        if (requestShowCount % config.showByTime == 0 && interstitialAdValue != null && adInterstitialState.value == AdInterstitialState.Loaded) {
+            logZ("Show Interstitial")
             lifecycleOwner.lifecycleScope.launch {
                 AdmobManager.adsShowFullScreen()
                 showDialogLoading()
@@ -112,12 +113,16 @@ class InterstitialAdHelper(
                     config.showByTime - 1
                 })
         val valueValid =
-            (interstitialAdValue == null && adInterstitialState.value != AdInterstitialState.Loading) || adInterstitialState.value == AdInterstitialState.Showed
+            (interstitialAdValue == null
+                    && (adInterstitialState.value != AdInterstitialState.Loading && adInterstitialState.value != AdInterstitialState.Loaded)
+                    )
+                    || adInterstitialState.value == AdInterstitialState.Showed
         return canRequestAds() && showConfigValid && valueValid
     }
 
     private fun createInterAds(activity: Activity) {
         if (requestValid()) {
+            logZ("Create Interstitial")
             lifecycleOwner.lifecycleScope.launch {
                 adInterstitialState.emit(AdInterstitialState.Loading)
                 AdmobFactory.getInstance()
@@ -152,6 +157,7 @@ class InterstitialAdHelper(
     private fun invokeListenerAdCallback(): InterstitialAdCallback {
         return object : InterstitialAdCallback {
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                logZ("onAdFailedToLoad ${loadAdError.message}")
                 invokeAdListener { it.onAdFailedToLoad(loadAdError) }
                 lifecycleOwner.lifecycleScope.launch {
                     adInterstitialState.emit(AdInterstitialState.Fail)
@@ -159,7 +165,7 @@ class InterstitialAdHelper(
             }
 
             override fun onAdLoaded(data: ContentAd.AdmobAd.ApInterstitialAd) {
-                Log.e(TAG, "onInterstitialLoad: ")
+                logZ("onAdLoaded")
                 interstitialAdValue = data.interstitialAd
                 lifecycleOwner.lifecycleScope.launch {
                     adInterstitialState.emit(AdInterstitialState.Loaded)
@@ -169,6 +175,7 @@ class InterstitialAdHelper(
 
 
             override fun onAdFailedToShow(adError: AdError) {
+                logZ("onAdFailedToShow ${adError.message}")
                 AdmobManager.adsFullScreenDismiss()
                 invokeAdListener { it.onNextAction() }
                 dialogLoading.dismiss()
@@ -179,6 +186,7 @@ class InterstitialAdHelper(
             }
 
             override fun onNextAction() {
+                logZ("onNextAction")
                 AdmobManager.adsFullScreenDismiss()
                 dialogLoading.dismiss()
                 cancelLoadingJob()
@@ -186,6 +194,7 @@ class InterstitialAdHelper(
             }
 
             override fun onAdClose() {
+                logZ("onAdClose")
                 AdmobManager.adsFullScreenDismiss()
                 dialogLoading.dismiss()
                 cancelLoadingJob()
@@ -193,6 +202,7 @@ class InterstitialAdHelper(
             }
 
             override fun onInterstitialShow() {
+                logZ("onInterstitialShow")
                 AdmobManager.adsShowFullScreen()
                 lifecycleOwner.lifecycleScope.launch {
                     adInterstitialState.emit(AdInterstitialState.Showed)
@@ -203,10 +213,12 @@ class InterstitialAdHelper(
             }
 
             override fun onAdClicked() {
+                logZ("onAdClicked")
                 invokeAdListener { it.onAdClicked() }
             }
 
             override fun onAdImpression() {
+                logZ("onAdImpression")
                 invokeAdListener { it.onAdImpression() }
             }
 
