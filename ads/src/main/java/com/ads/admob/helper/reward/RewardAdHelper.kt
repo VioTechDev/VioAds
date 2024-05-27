@@ -41,6 +41,9 @@ class RewardAdHelper(
     private val dialogLoading by lazy { LoadingAdsDialog(activity) }
     private var loadingJob: Job? = null
 
+    init {
+        requestShowCount = config.currentTime
+    }
     override fun requestAds(param: RewardAdParam) {
         lifecycleOwner.lifecycleScope.launch {
             if (canRequestAds()) {

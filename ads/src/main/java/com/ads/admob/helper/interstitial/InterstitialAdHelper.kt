@@ -39,6 +39,10 @@ class InterstitialAdHelper(
     private val dialogLoading by lazy { LoadingAdsDialog(activity) }
     private var loadingJob: Job? = null
 
+    init {
+        requestShowCount = config.currentTime
+    }
+
     override fun requestAds(param: InterstitialAdParam) {
         lifecycleOwner.lifecycleScope.launch {
             if (canRequestAds()) {

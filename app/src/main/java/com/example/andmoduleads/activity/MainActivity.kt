@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity() {
             idAds = "ca-app-pub-3940256099942544/1033173712",
             canShowAds = true,
             canReloadAds = true,
-            showByTime = 1
+            showByTime = 3,
+            currentTime = 1
         )
         return InterstitialAdHelper(
             activity = this,
@@ -127,6 +128,7 @@ class MainActivity : AppCompatActivity() {
 
             })
         binding?.button3?.setOnClickListener {
+            Log.e("TAG", "onCreate: button3", )
             interAdHelper.requestAds(InterstitialAdParam.ShowAd)
         }
         binding?.frAds?.let {
