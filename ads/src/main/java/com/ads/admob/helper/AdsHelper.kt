@@ -92,3 +92,18 @@ interface IAdsConfig {
     val canShowAds: Boolean
     val canReloadAds: Boolean
 }
+
+/**
+ * Enum representing the visibility options for advertising elements.
+ */
+enum class AdOptionVisibility {
+    /**
+     * The advertising element is not visible and does not occupy any space in the layout.
+     */
+    GONE,
+
+    /**
+     * The advertising element is invisible but still occupies space in the layout.
+     */
+    INVISIBLE
+}

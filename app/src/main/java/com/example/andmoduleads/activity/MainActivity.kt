@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.ads.admob.BannerInlineStyle
 import com.ads.admob.data.ContentAd
+import com.ads.admob.helper.AdOptionVisibility
 import com.ads.admob.helper.adnative.NativeAdConfig
 import com.ads.admob.helper.adnative.NativeAdHelper
 import com.ads.admob.helper.adnative.params.NativeAdParam
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
     private val nativeAdHelper by lazy {
         val config = NativeAdConfig(
-            "ca-app-pub-4584260126367940/7901355648",
+            "ca-app-pub-3940256099942544/22476961103",
             true,
             true,
            R.layout.native_exit1
@@ -68,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             this,
             config
         ).apply {
-
+            adVisibility = AdOptionVisibility.INVISIBLE
         }
     }
 

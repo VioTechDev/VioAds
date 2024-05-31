@@ -1,14 +1,14 @@
 package com.ads.admob.helper.adnative
 
 import android.app.Activity
+import android.view.View
 import android.widget.FrameLayout
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.data.ContentAd
+import com.ads.admob.helper.AdOptionVisibility
 import com.ads.admob.helper.AdsHelper
 import com.ads.admob.helper.adnative.params.AdNativeState
 import com.ads.admob.helper.adnative.params.NativeAdParam
@@ -43,6 +43,8 @@ class NativeAdHelper(
     private var shimmerLayoutView: ShimmerFrameLayout? = null
     private var nativeContentView: FrameLayout? = null
     private var isRequestValid = true
+    var adVisibility: AdOptionVisibility = AdOptionVisibility.GONE
+
     var nativeAd: NativeAd? = null
         private set
 
@@ -51,8 +53,8 @@ class NativeAdHelper(
         lifecycleEventState.onEach {
             if (it == Lifecycle.Event.ON_CREATE) {
                 if (!canRequestAds()) {
-                    nativeContentView?.isVisible = false
-                    shimmerLayoutView?.isVisible = false
+                    nativeContentView?.checkAdVisibility(false)
+                    shimmerLayoutView?.checkAdVisibility(false)
                 }
             }
             if (it == Lifecycle.Event.ON_RESUME) {
@@ -89,7 +91,7 @@ class NativeAdHelper(
             this.shimmerLayoutView = shimmerLayoutView
             if (lifecycleOwner.lifecycle.currentState in Lifecycle.State.CREATED..Lifecycle.State.RESUMED) {
                 if (!canRequestAds()) {
-                    shimmerLayoutView.isVisible = false
+                    shimmerLayoutView.checkAdVisibility(false)
                 }
             }
         }
@@ -100,7 +102,7 @@ class NativeAdHelper(
             this.nativeContentView = nativeContentView
             if (lifecycleOwner.lifecycle.currentState in Lifecycle.State.CREATED..Lifecycle.State.RESUMED) {
                 if (!canRequestAds()) {
-                    nativeContentView.isVisible = false
+                    nativeContentView.checkAdVisibility(false)
                 }
             }
         }
@@ -112,8 +114,8 @@ class NativeAdHelper(
     }
 
     private fun handleShowAds(adsParam: AdNativeState) {
-        nativeContentView?.isGone = adsParam is AdNativeState.Cancel || !canShowAds()
-        shimmerLayoutView?.isVisible = adsParam is AdNativeState.Loading
+        nativeContentView?.checkAdVisibility(adsParam !is AdNativeState.Cancel && canShowAds())
+        shimmerLayoutView?.checkAdVisibility(adsParam is AdNativeState.Loading)
         when (adsParam) {
             is AdNativeState.Loaded -> {
                 if (nativeContentView != null && shimmerLayoutView != null) {
@@ -275,6 +277,21 @@ class NativeAdHelper(
                 invokeAdListener { it.onAdFailedToShow(adError) }
             }
 
+        }
+    }
+
+    /**
+     * Adjusts the visibility of the [View] based on the provided visibility state and
+     * the configured ad visibility option.
+     *
+     * @param isVisible A boolean indicating whether the view should be set to visible.
+     * @see AdOptionVisibility
+     */
+    private fun View.checkAdVisibility(isVisible: Boolean) {
+        visibility = if (isVisible) View.VISIBLE
+        else when (adVisibility) {
+            AdOptionVisibility.GONE -> View.GONE
+            AdOptionVisibility.INVISIBLE -> View.INVISIBLE
         }
     }
 }
