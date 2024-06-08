@@ -14,7 +14,6 @@ import com.ads.admob.listener.NativeAdCallback
 import com.ads.admob.listener.RewardAdCallBack
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.rewarded.RewardedAd
 
 /**
  * Created by ViO on 16/03/2024.
@@ -35,7 +34,7 @@ interface AdmobFactory {
 
     fun populateNativeAdView(
         activity: Context,
-        nativeAd: NativeAd,
+        nativeAd: ContentAd,
         @LayoutRes nativeAdViewId: Int,
         adPlaceHolder: FrameLayout,
         containerShimmerLoading: ShimmerFrameLayout?,
@@ -53,7 +52,7 @@ interface AdmobFactory {
     fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack)
     fun showRewardAd(
         activity: Activity,
-        rewardedAd: RewardedAd,
+        rewardedAd: ContentAd,
         adCallback: RewardAdCallBack
     )
     companion object {

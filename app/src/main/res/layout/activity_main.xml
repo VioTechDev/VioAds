@@ -33,7 +33,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
-            <include layout="@layout/layout_banner_control" />
+            <include layout="@layout/load_fb_banner"/>
+            <include
+                android:id="@+id/fl_shimemr"
+                layout="@layout/loading_native_medium" />
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
