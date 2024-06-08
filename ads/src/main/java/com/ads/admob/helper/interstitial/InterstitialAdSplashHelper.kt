@@ -162,16 +162,14 @@ class InterstitialAdSplashHelper(
             }
 
             override fun onAdLoaded(data: ContentAd) {
-                if (data is ContentAd.AdmobAd.ApInterstitialAd){
-                    interstitialAdValue = data
-                    lifecycleOwner.lifecycleScope.launch {
-                        adInterstitialState.emit(AdInterstitialState.Loaded)
-                    }
-                    if (showValid && config.showReady) {
-                        showInterAds(activity)
-                    } else {
-                        invokeAdListener { it.onAdLoaded(data) }
-                    }
+                interstitialAdValue = data
+                lifecycleOwner.lifecycleScope.launch {
+                    adInterstitialState.emit(AdInterstitialState.Loaded)
+                }
+                if (showValid && config.showReady) {
+                    showInterAds(activity)
+                } else {
+                    invokeAdListener { it.onAdLoaded(data) }
                 }
             }
 
