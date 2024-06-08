@@ -1,4 +1,4 @@
-package com.ads.admob.helper.reward.factory
+package com.ads.admob.helper.reward.factory.admob
 
 import android.app.Activity
 import android.content.Context

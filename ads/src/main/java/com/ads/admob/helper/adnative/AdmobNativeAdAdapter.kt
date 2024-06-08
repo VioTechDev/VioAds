@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ads.admob.data.ContentAd
-import com.ads.admob.helper.adnative.factory.AdmobNativeFactory
+import com.ads.admob.helper.adnative.factory.admob.AdmobNativeFactory
 import com.ads.admob.listener.NativeAdCallback
 import com.ads.admob.widget.RecyclerViewAdapterWrapper
 import com.ads.control.R
@@ -84,34 +84,37 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
 
                     }
 
-                    override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
-                        AdmobNativeFactory.getInstance().populateNativeAdView(
-                            holder.itemView.context,
-                            data.nativeAd,
-                            nativeAdapterConfig.nativeContentView,
-                            holder.nativeContentView,
-                            holder.shimmerLayoutView,
-                            object : NativeAdCallback {
-                                override fun populateNativeAd() {
+                    override fun onAdLoaded(data: ContentAd) {
+                        if (data is ContentAd.AdmobAd.ApNativeAd){
+                            AdmobNativeFactory.getInstance().populateNativeAdView(
+                                holder.itemView.context,
+                                data.nativeAd,
+                                nativeAdapterConfig.nativeContentView,
+                                holder.nativeContentView,
+                                holder.shimmerLayoutView,
+                                object : NativeAdCallback {
+                                    override fun populateNativeAd() {
 
-                                }
+                                    }
 
-                                override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
-                                }
+                                    override fun onAdLoaded(data: ContentAd) {
+                                    }
 
-                                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                                }
+                                    override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                                    }
 
-                                override fun onAdClicked() {
-                                }
+                                    override fun onAdClicked() {
+                                    }
 
-                                override fun onAdImpression() {
-                                }
+                                    override fun onAdImpression() {
+                                    }
 
-                                override fun onAdFailedToShow(adError: AdError) {
-                                }
+                                    override fun onAdFailedToShow(adError: AdError) {
+                                    }
 
-                            })
+                                })
+                        }
+
                     }
 
                     override fun onAdFailedToLoad(loadAdError: LoadAdError) {

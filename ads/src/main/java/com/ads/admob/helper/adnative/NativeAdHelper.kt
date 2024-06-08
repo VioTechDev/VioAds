@@ -45,7 +45,7 @@ class NativeAdHelper(
     private var isRequestValid = true
     var adVisibility: AdOptionVisibility = AdOptionVisibility.GONE
 
-    var nativeAd: NativeAd? = null
+    var nativeAd: ContentAd? = null
         private set
 
     init {
@@ -157,11 +157,11 @@ class NativeAdHelper(
             override fun populateNativeAd() {
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 if (isActiveState()) {
-                    this@NativeAdHelper.nativeAd = data.nativeAd
+                    this@NativeAdHelper.nativeAd = data
                     lifecycleOwner.lifecycleScope.launch {
-                        adNativeState.emit(AdNativeState.Loaded(data.nativeAd))
+                        adNativeState.emit(AdNativeState.Loaded(data))
                     }
                     logZ("onNativeAdLoaded")
                 } else {
@@ -255,7 +255,7 @@ class NativeAdHelper(
                 invokeAdListener { it.populateNativeAd() }
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 invokeAdListener {
                     it.onAdLoaded(data)
                 }

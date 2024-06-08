@@ -1,6 +1,7 @@
 package com.example.andmoduleads.activity
 
 import android.annotation.SuppressLint
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,7 @@ import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.AdOptionVisibility
 import com.ads.admob.helper.adnative.NativeAdConfig
 import com.ads.admob.helper.adnative.NativeAdHelper
+import com.ads.admob.helper.adnative.params.NativeAdParam
 import com.ads.admob.helper.banner.BannerAdConfig
 import com.ads.admob.helper.banner.BannerAdHelper
 import com.ads.admob.helper.banner.params.BannerAdParam
@@ -24,7 +26,11 @@ import com.example.andmoduleads.R
 import com.example.andmoduleads.databinding.ActivityMainBinding
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
@@ -47,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
     private val rewardAdHelper by lazy {
-        val rewardAdConfig = RewardAdConfig("ca-app-pub-3940256099942544/5224354917", 1, true, true)
+        val rewardAdConfig = RewardAdConfig("7acc879a59a089aa", 1, true, true)
         RewardAdHelper(
             this, this, rewardAdConfig
         ).apply {
@@ -56,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     }
     private val nativeAdHelper by lazy {
         val config = NativeAdConfig(
-            "ca-app-pub-3940256099942544/22476961103",
+            "c2b390cda8403c0a",
             true,
             true,
            R.layout.native_exit1
@@ -90,6 +96,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
+        binding?.frAds?.let {
+            nativeAdHelper.setNativeContentView(it)
+        }
+        binding?.flShimemr?.let {
+            nativeAdHelper.setShimmerLayoutView(it.shimmerContainerNative)
+        }
+        nativeAdHelper.requestAds(NativeAdParam.Request)
         rewardAdHelper.requestAds(RewardAdParam.Request)
         interAdHelper.requestAds(InterstitialAdParam.Request)
         rewardAdHelper.registerAdListener(object : RewardAdCallBack {
@@ -103,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onRewardShow() {
                 }
 
-                override fun onAdLoaded(data: ContentAd.AdmobAd.ApRewardAd) {
+                override fun onAdLoaded(data: ContentAd) {
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
@@ -122,13 +135,13 @@ class MainActivity : AppCompatActivity() {
 
             })
         binding?.button3?.setOnClickListener {
-            interAdHelper.requestAds(InterstitialAdParam.ShowAd)
+            rewardAdHelper.requestAds(RewardAdParam.ShowAd)
         }
         binding?.frAds?.let {
             Log.e("TAG", "onCreate: ")
             bannerAdHelper.setBannerContentView(it)
         }
-        bannerAdHelper.requestAds(BannerAdParam.Request)
+        //bannerAdHelper.requestAds(BannerAdParam.Request)
         val list: MutableList<String> = ArrayList()
         for (i in 0..29) {
             list.add("Let's save the world $i")

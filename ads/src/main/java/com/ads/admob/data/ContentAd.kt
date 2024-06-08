@@ -1,7 +1,11 @@
 package com.ads.admob.data
 
+import com.applovin.mediation.MaxAd
 import com.applovin.mediation.ads.MaxAdView
 import com.applovin.mediation.ads.MaxInterstitialAd
+import com.applovin.mediation.ads.MaxRewardedAd
+import com.applovin.mediation.nativeAds.MaxNativeAdLoader
+import com.applovin.mediation.nativeAds.MaxNativeAdView
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.google.android.gms.ads.interstitial.InterstitialAd
@@ -25,5 +29,7 @@ sealed class ContentAd {
     sealed class MaxContentAd : ContentAd() {
         data class ApInterstitialAd(val interstitialAd: MaxInterstitialAd) : MaxContentAd()
         data class ApBannerAd(val adView: MaxAdView) : MaxContentAd()
+        data class ApRewardAd(val rewardAd: MaxRewardedAd) : MaxContentAd()
+        data class ApNativeAd(val maxNativeAdLoader: MaxNativeAdLoader, val nativeAd: MaxAd) : MaxContentAd()
     }
 }

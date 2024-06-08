@@ -3,6 +3,7 @@ package com.ads.admob.helper.banner
 import android.app.Activity
 import android.graphics.Color
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -117,6 +118,12 @@ class BannerAdHelper(
                                 it.addView(adsParam.adBanner.adView)
                             }
                             is ContentAd.MaxContentAd.ApBannerAd -> {
+                                val width = ViewGroup.LayoutParams.MATCH_PARENT
+                                // Banner height on phones and tablets is 50 and 90, respectively
+                                val heightPx: Int = activity.resources
+                                    .getDimensionPixelSize(R.dimen.banner_height)
+                                adsParam.adBanner.adView.layoutParams =
+                                    FrameLayout.LayoutParams(width, heightPx)
                                 it.addView(adsParam.adBanner.adView)
                             }
                              else -> {

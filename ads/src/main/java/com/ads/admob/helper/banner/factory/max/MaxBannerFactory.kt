@@ -6,7 +6,6 @@ import com.ads.admob.listener.BannerAdCallBack
 /**
  * Created by ViO on 16/03/2024.
  */
-ø
 
 interface MaxBannerFactory {
     fun requestBannerAd(
