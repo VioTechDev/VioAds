@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.ads.admob.BannerInlineStyle
+import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.AdOptionVisibility
 import com.ads.admob.helper.adnative.NativeAdConfig
@@ -36,10 +37,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun initInterAdAd(): InterstitialAdHelper {
         val config = InterstitialAdConfig(
-            idAds = "ca-app-pub-3940256099942544/1033173712",
+            idAds = "7172848836d13826",
             canShowAds = true,
             canReloadAds = true,
-            showByTime = 3,
+            showByTime = 1,
             currentTime = 1
         )
         return InterstitialAdHelper(

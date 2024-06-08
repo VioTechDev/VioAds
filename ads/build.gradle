@@ -76,7 +76,7 @@ dependencies {
     implementation 'com.airbnb.android:lottie:5.0.2'
 
     // applovin
-    implementation 'com.applovin:applovin-sdk:12.2.0'
+    implementation 'com.applovin:applovin-sdk:12.5.0'
     implementation("com.applovin.mediation:google-ad-manager-adapter:+")
     implementation 'com.bigossp:bigo-ads:2.8.0'
     implementation 'com.bigossp:max-mediation:2.8.0.0'

@@ -119,7 +119,7 @@ class NativeAdHelper(
         when (adsParam) {
             is AdNativeState.Loaded -> {
                 if (nativeContentView != null && shimmerLayoutView != null) {
-                    AdmobFactory.getInstance().populateNativeAdView(
+                    AdmobFactory.INSTANCE.populateNativeAdView(
                         activity,
                         adsParam.adNative,
                         config.getLayoutIdByMediationNativeAd(adsParam.adNative),
@@ -146,7 +146,7 @@ class NativeAdHelper(
 
     private fun createNativeAds(activity: Activity) {
         if (canRequestAds()) {
-            AdmobFactory.getInstance()
+            AdmobFactory.INSTANCE
                 .requestNativeAd(context = activity, config.idAds, invokeListenerAdCallback())
         }
     }

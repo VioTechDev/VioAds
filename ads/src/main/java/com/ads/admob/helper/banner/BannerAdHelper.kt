@@ -169,7 +169,7 @@ class BannerAdHelper(
 
     private fun loadBannerAd() {
         if (canRequestAds()) {
-            AdmobFactory.getInstance()
+            AdmobFactory.INSTANCE
                 .requestBannerAd(
                     activity,
                     config.idAds,

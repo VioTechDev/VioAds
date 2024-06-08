@@ -48,7 +48,7 @@ class SplashActivity : AppCompatActivity() {
         override fun onInterstitialShow() {
         }
 
-        override fun onAdLoaded(data: ContentAd.AdmobAd.ApInterstitialAd) {
+        override fun onAdLoaded(data: ContentAd) {
         }
 
         override fun onAdFailedToLoad(loadAdError: LoadAdError) {

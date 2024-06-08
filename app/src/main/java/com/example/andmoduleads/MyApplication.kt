@@ -1,14 +1,16 @@
 package com.example.andmoduleads
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.adjust.sdk.AdjustConfig
 import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.config.NetworkProvider
 import com.ads.admob.config.VioAdConfig
 import com.ads.admob.config.VioAdjustConfig
 import com.ads.admob.helper.appoppen.AppResumeAdConfig
 import com.ads.admob.helper.appoppen.AppResumeAdHelper
+import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkConfiguration
 import com.example.andmoduleads.activity.SplashActivity
 import com.google.android.gms.ads.AdActivity
 
@@ -38,18 +40,12 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        application = this
-        initAppOpenAd().setRequestAppResumeValid(false)
         val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  false).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
-            .mediationProvider(NetworkProvider.ADMOB)
+            .mediationProvider(NetworkProvider.MAX)
             .listTestDevices(arrayListOf("FBDA72C75E0671544A38367B5AACCEC7"))
             .build()
-        AdmobFactory.getInstance().initAdmob(this, vioAdConfig)
-    }
-    companion object {
-        var application: MyApplication? = null
-            private set
+        AdmobFactory.INSTANCE.initAdmob(this, vioAdConfig)
     }
 }
