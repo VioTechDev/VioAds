@@ -1,6 +1,7 @@
 package com.ads.admob.helper.interstitial
 
 import android.app.Activity
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.ads.admob.AdmobManager
@@ -13,7 +14,6 @@ import com.ads.admob.helper.interstitial.params.InterstitialAdParam
 import com.ads.admob.listener.InterstitialAdCallback
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +32,7 @@ class InterstitialAdHelper(
         CopyOnWriteArrayList()
     private val adInterstitialState: MutableStateFlow<AdInterstitialState> =
         MutableStateFlow(if (canRequestAds()) AdInterstitialState.None else AdInterstitialState.Fail)
-    var interstitialAdValue: InterstitialAd? = null
+    var interstitialAdValue: ContentAd? = null
         private set
     private var requestShowCount = 0
 
@@ -86,7 +86,7 @@ class InterstitialAdHelper(
                 AdmobManager.adsShowFullScreen()
                 showDialogLoading()
                 delay(800)
-                AdmobFactory.getInstance()
+                AdmobFactory.INSTANCE
                     .showInterstitial(activity, interstitialAdValue, invokeListenerAdCallback())
                 loadingJob = lifecycleOwner.lifecycleScope.launch {
                     delay(2000)
@@ -132,7 +132,7 @@ class InterstitialAdHelper(
             logZ("Create Interstitial")
             lifecycleOwner.lifecycleScope.launch {
                 adInterstitialState.emit(AdInterstitialState.Loading)
-                AdmobFactory.getInstance()
+                AdmobFactory.INSTANCE
                     .requestInterstitialAds(
                         activity,
                         config.idAds,
@@ -171,9 +171,9 @@ class InterstitialAdHelper(
                 }
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApInterstitialAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 logZ("onAdLoaded")
-                interstitialAdValue = data.interstitialAd
+                interstitialAdValue = data
                 lifecycleOwner.lifecycleScope.launch {
                     adInterstitialState.emit(AdInterstitialState.Loaded)
                 }

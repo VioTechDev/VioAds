@@ -83,7 +83,7 @@ class RewardAdHelper(
                 AdmobManager.adsShowFullScreen()
                 showDialogLoading()
                 delay(800)
-                AdmobFactory.getInstance()
+                AdmobFactory.INSTANCE
                     .showRewardAd(activity, rewardAdValue!!, invokeRewardAdCallback())
                 loadingJob = lifecycleOwner.lifecycleScope.launch {
                     delay(2000)
@@ -129,7 +129,7 @@ class RewardAdHelper(
             lifecycleOwner.lifecycleScope.launch {
                 adRewardState.emit(AdRewardState.Loading)
                logZ("createRewardAds")
-                AdmobFactory.getInstance()
+                AdmobFactory.INSTANCE
                     .requestRewardAd(
                         activity,
                         config.idAds,

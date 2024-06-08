@@ -6,14 +6,14 @@ import android.content.Context
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import com.ads.admob.BannerInlineStyle
-import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.nativead.NativeAd
 import com.ads.admob.config.VioAdConfig
+import com.ads.admob.data.ContentAd
 import com.ads.admob.listener.BannerAdCallBack
 import com.ads.admob.listener.InterstitialAdCallback
 import com.ads.admob.listener.NativeAdCallback
 import com.ads.admob.listener.RewardAdCallBack
+import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.rewarded.RewardedAd
 
 /**
@@ -46,7 +46,7 @@ interface AdmobFactory {
 
     fun showInterstitial(
         context: Context,
-        interstitialAd: InterstitialAd?,
+        interstitialAd: ContentAd?,
         adCallback: InterstitialAdCallback
     )
 
@@ -57,7 +57,6 @@ interface AdmobFactory {
         adCallback: RewardAdCallBack
     )
     companion object {
-        @JvmStatic
-        fun getInstance(): AdmobFactory = AdmobFactoryImpl()
+        val INSTANCE: AdmobFactory by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { AdmobFactoryImpl() }
     }
 }

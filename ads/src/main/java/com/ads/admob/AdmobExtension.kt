@@ -6,9 +6,13 @@ import android.util.DisplayMetrics
 import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
+import com.applovin.mediation.MaxError
 import com.google.ads.mediation.admob.AdMobAdapter
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.LoadAdError
+
 /**
  * Created by ViO on 16/03/2024.
  */
@@ -85,3 +89,6 @@ annotation class RewardType {
         const val INTERSTITIAL = 1
     }
 }
+
+fun MaxError.toLoadAdError() = run { LoadAdError(this.code, this.message, "", null, null) }
+fun MaxError.toAdError() = run { AdError(this.code, this.message, "") }
