@@ -1,6 +1,6 @@
 package com.ads.admob.data
 
-import com.applovin.mediation.MaxAd
+import com.applovin.mediation.ads.MaxAdView
 import com.applovin.mediation.ads.MaxInterstitialAd
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.appopen.AppOpenAd
@@ -24,5 +24,6 @@ sealed class ContentAd {
 
     sealed class MaxContentAd : ContentAd() {
         data class ApInterstitialAd(val interstitialAd: MaxInterstitialAd) : MaxContentAd()
+        data class ApBannerAd(val adView: MaxAdView) : MaxContentAd()
     }
 }
