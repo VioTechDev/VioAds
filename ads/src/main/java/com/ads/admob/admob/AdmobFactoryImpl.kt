@@ -18,7 +18,8 @@ import com.ads.admob.config.VioAdConfig
 import com.ads.admob.config.VioAdjustConfig
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.adnative.factory.AdmobNativeFactory
-import com.ads.admob.helper.banner.factory.AdmobBannerFactory
+import com.ads.admob.helper.banner.factory.admob.AdmobBannerFactory
+import com.ads.admob.helper.banner.factory.max.MaxBannerFactory
 import com.ads.admob.helper.interstitial.factory.admob.AdmobInterstitialAdFactory
 import com.ads.admob.helper.interstitial.factory.max.MaxInterstitialAdFactory
 import com.ads.admob.helper.reward.factory.AdmobRewardAdFactory
@@ -178,46 +179,87 @@ class AdmobFactoryImpl : AdmobFactory {
         useInlineAdaptive: Boolean,
         adCallback: BannerAdCallBack
     ) {
-        AdmobBannerFactory.getInstance()
-            .requestBannerAd(
-                context,
-                adId,
-                collapsibleGravity,
-                bannerInlineStyle,
-                useInlineAdaptive,
-                object : BannerAdCallBack{
-                    override fun onAdLoaded(data: ContentAd.AdmobAd.ApBannerAd) {
-                        adCallback.onAdLoaded(data)
-                        data.adView.setOnPaidEventListener {adValue ->
-                            val loadedAdapterResponseInfo: AdapterResponseInfo? = data.adView.responseInfo?.loadedAdapterResponseInfo
-                            val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-                            adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
-                            adRevenue.setAdRevenuePlacement("Banner")
-                            if (loadedAdapterResponseInfo != null) {
-                                adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+        when (vioAdConfig.provider) {
+            NetworkProvider.ADMOB -> {
+                AdmobBannerFactory.getInstance()
+                    .requestBannerAd(
+                        context,
+                        adId,
+                        collapsibleGravity,
+                        bannerInlineStyle,
+                        useInlineAdaptive,
+                        object : BannerAdCallBack {
+                            override fun onAdLoaded(data: ContentAd) {
+                                adCallback.onAdLoaded(data)
+                                if (data is ContentAd.AdmobAd.ApBannerAd) {
+                                    data.adView.setOnPaidEventListener { adValue ->
+                                        val loadedAdapterResponseInfo: AdapterResponseInfo? =
+                                            data.adView.responseInfo?.loadedAdapterResponseInfo
+                                        val adRevenue =
+                                            AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+                                        adRevenue.setRevenue(
+                                            adValue.valueMicros / 1000000.0,
+                                            adValue.currencyCode
+                                        )
+                                        adRevenue.setAdRevenuePlacement("Banner")
+                                        if (loadedAdapterResponseInfo != null) {
+                                            adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+                                        }
+                                        Adjust.trackAdRevenue(adRevenue)
+                                    }
+                                }
                             }
-                            Adjust.trackAdRevenue(adRevenue)
+
+                            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                                adCallback.onAdFailedToLoad(loadAdError)
+                            }
+
+                            override fun onAdClicked() {
+                                adCallback.onAdClicked()
+                            }
+
+                            override fun onAdImpression() {
+                                adCallback.onAdImpression()
+                            }
+
+                            override fun onAdFailedToShow(adError: AdError) {
+                                adCallback.onAdFailedToShow(adError)
+                            }
+
                         }
-                    }
+                    )
+            }
 
-                    override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                        adCallback.onAdFailedToLoad(loadAdError)
-                    }
+            NetworkProvider.MAX -> {
+                MaxBannerFactory.getInstance()
+                    .requestBannerAd(
+                        context,
+                        adId,
+                        object : BannerAdCallBack {
+                            override fun onAdLoaded(data: ContentAd) {
+                                adCallback.onAdLoaded(data)
+                            }
 
-                    override fun onAdClicked() {
-                       adCallback.onAdClicked()
-                    }
+                            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                                adCallback.onAdFailedToLoad(loadAdError)
+                            }
 
-                    override fun onAdImpression() {
-                       adCallback.onAdImpression()
-                    }
+                            override fun onAdClicked() {
+                                adCallback.onAdClicked()
+                            }
 
-                    override fun onAdFailedToShow(adError: AdError) {
-                       adCallback.onAdFailedToShow(adError)
-                    }
+                            override fun onAdImpression() {
+                                adCallback.onAdImpression()
+                            }
 
-                }
-            )
+                            override fun onAdFailedToShow(adError: AdError) {
+                                adCallback.onAdFailedToShow(adError)
+                            }
+                        }
+                    )
+            }
+        }
+
     }
 
     override fun requestNativeAd(

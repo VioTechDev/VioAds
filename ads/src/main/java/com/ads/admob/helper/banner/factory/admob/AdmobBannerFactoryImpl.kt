@@ -1,4 +1,4 @@
-package com.ads.admob.helper.banner.factory
+package com.ads.admob.helper.banner.factory.admob
 
 import android.app.Activity
 import android.content.Context

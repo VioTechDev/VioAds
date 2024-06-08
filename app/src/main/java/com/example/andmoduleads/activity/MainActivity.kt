@@ -4,13 +4,10 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.ads.admob.BannerInlineStyle
-import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.AdOptionVisibility
 import com.ads.admob.helper.adnative.NativeAdConfig
 import com.ads.admob.helper.adnative.NativeAdHelper
-import com.ads.admob.helper.adnative.params.NativeAdParam
 import com.ads.admob.helper.banner.BannerAdConfig
 import com.ads.admob.helper.banner.BannerAdHelper
 import com.ads.admob.helper.banner.params.BannerAdParam
@@ -79,9 +76,7 @@ class MainActivity : AppCompatActivity() {
         val config = BannerAdConfig(
             idAds = "ca-app-pub-4584260126367940/4345254018",
             canShowAds = true,
-            canReloadAds = true,
-            bannerInlineStyle = BannerInlineStyle.LARGE_STYLE,
-            useInlineAdaptive = true
+            canReloadAds = true
         )
         return BannerAdHelper(activity = this, lifecycleOwner = this, config = config)
     }
@@ -95,9 +90,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
-        binding?.frAds?.let { nativeAdHelper.setNativeContentView(it) }
-        binding?.shimmerBanner?.shimmerContainerNative?.let { nativeAdHelper.setShimmerLayoutView(it) }
-        nativeAdHelper.requestAds(NativeAdParam.Request)
         rewardAdHelper.requestAds(RewardAdParam.Request)
         interAdHelper.requestAds(InterstitialAdParam.Request)
         rewardAdHelper.registerAdListener(object : RewardAdCallBack {
@@ -130,16 +122,13 @@ class MainActivity : AppCompatActivity() {
 
             })
         binding?.button3?.setOnClickListener {
-            Log.e("TAG", "onCreate: button3", )
             interAdHelper.requestAds(InterstitialAdParam.ShowAd)
         }
         binding?.frAds?.let {
+            Log.e("TAG", "onCreate: ")
             bannerAdHelper.setBannerContentView(it)
         }
-        if (bannerAdHelper.bannerAdView == null) {
-            bannerAdHelper.requestAds(BannerAdParam.Request)
-        }
-
+        bannerAdHelper.requestAds(BannerAdParam.Request)
         val list: MutableList<String> = ArrayList()
         for (i in 0..29) {
             list.add("Let's save the world $i")
@@ -155,7 +144,6 @@ class MainActivity : AppCompatActivity() {
 
         // Create adapter passing in the sample user data
         val cats: List<Contact> = List(20/4) {
-            Log.e("TAG", "onCreate: $it", )
             Contact("vinhvh $it",true)
         }
 
@@ -164,7 +152,6 @@ class MainActivity : AppCompatActivity() {
         //Build the native adapter from the current adapter
 
         val listData = contacts?.chunked(20/4)?.mapIndexed { index, contacts ->
-            Log.e("TAG", "onCreate: ", )
             contacts.toMutableList().apply {
                 add(1, cats[index]) }
         }?.flatten()
