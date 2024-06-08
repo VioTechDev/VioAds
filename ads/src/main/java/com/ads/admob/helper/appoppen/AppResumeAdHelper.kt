@@ -57,7 +57,7 @@ class AppResumeAdHelper(
 
     init {
         lifecycleOwner.lifecycle.addObserver(this)
-        appOpenAdManager = AppOpenAdManager()
+        appOpenAdManager = AppOpenAdManager(config.networkProvider)
         appOpenAdManager.setAdUnitId(config.idAds)
         appOpenAdManager.loadAd(application)
         application.registerActivityLifecycleCallbacks(this)

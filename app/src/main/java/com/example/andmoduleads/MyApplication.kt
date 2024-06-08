@@ -27,9 +27,10 @@ class MyApplication : Application() {
         listClassInValid.add(AdActivity::class.java)
         listClassInValid.add(SplashActivity::class.java)
         val config = AppResumeAdConfig(
-            idAds = "ca-app-pub-3940256099942544/9257395921",
+            idAds = "c2026e2d6ea47670",
             listClassInValid = listClassInValid,
-            canShowAds = false
+            canShowAds = false,
+            networkProvider = NetworkProvider.MAX
         )
         return AppResumeAdHelper(
             application = this,
@@ -40,6 +41,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        initAppOpenAd()
         val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  false).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
