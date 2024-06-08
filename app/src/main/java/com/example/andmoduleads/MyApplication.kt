@@ -28,9 +28,10 @@ class MyApplication : Application() {
         listClassInValid.add(AdActivity::class.java)
         listClassInValid.add(SplashActivity::class.java)
         val config = AppResumeAdConfig(
-            idAds = "ca-app-pub-3940256099942544/9257395921",
+            idAds = "c2026e2d6ea47670",
             listClassInValid = listClassInValid,
-            canShowAds = true
+            canShowAds = false,
+            networkProvider = NetworkProvider.MAX
         )
         return AppResumeAdHelper(
             application = this,

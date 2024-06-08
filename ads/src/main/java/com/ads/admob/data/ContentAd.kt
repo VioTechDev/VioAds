@@ -2,6 +2,7 @@ package com.ads.admob.data
 
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.ads.MaxAdView
+import com.applovin.mediation.ads.MaxAppOpenAd
 import com.applovin.mediation.ads.MaxInterstitialAd
 import com.applovin.mediation.ads.MaxRewardedAd
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
@@ -31,5 +32,7 @@ sealed class ContentAd {
         data class ApBannerAd(val adView: MaxAdView) : MaxContentAd()
         data class ApRewardAd(val rewardAd: MaxRewardedAd) : MaxContentAd()
         data class ApNativeAd(val maxNativeAdLoader: MaxNativeAdLoader, val nativeAd: MaxAd) : MaxContentAd()
+        data class ApAppOpenAd(val appOpenAd: MaxAppOpenAd) : MaxContentAd()
+
     }
 }

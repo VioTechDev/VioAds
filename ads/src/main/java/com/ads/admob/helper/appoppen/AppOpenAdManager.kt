@@ -6,7 +6,14 @@ import android.util.Log
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
+import com.ads.admob.config.NetworkProvider
+import com.ads.admob.data.ContentAd
 import com.ads.admob.listener.AppOpenAdCallBack
+import com.ads.admob.toAdError
+import com.applovin.mediation.MaxAd
+import com.applovin.mediation.MaxAdListener
+import com.applovin.mediation.MaxError
+import com.applovin.mediation.ads.MaxAppOpenAd
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdapterResponseInfo
@@ -19,12 +26,12 @@ import java.util.Date
  * Created by ViO on 16/03/2024.
  */
 
-class AppOpenAdManager {
+class AppOpenAdManager(private val networkManager: Int) {
     companion object {
         val TAG = AppOpenAdManager::class.simpleName
     }
 
-    private var appOpenAd: AppOpenAd? = null
+    private var appOpenAd: ContentAd? = null
     private var isLoadingAd = false
     var isShowingAd = false
     private var adUnitId = ""
@@ -52,50 +59,104 @@ class AppOpenAdManager {
         }
         Log.e(TAG, "loadAd: Valid", )
         isLoadingAd = true
-        val request = AdRequest.Builder().build()
-        AppOpenAd.load(
-            context,
-            adUnitId,
-            request,
-            object : AppOpenAd.AppOpenAdLoadCallback() {
-                /**
-                 * Called when an app open ad has loaded.
-                 *
-                 * @param ad the loaded app open ad.
-                 */
-                override fun onAdLoaded(ad: AppOpenAd) {
-                    appOpenAd = ad
-                    isLoadingAd = false
-                    loadTime = Date().time
-                    Log.e(TAG, "onAdLoaded: ")
+        when (networkManager) {
+            NetworkProvider.ADMOB -> {
+                val request = AdRequest.Builder().build()
+                AppOpenAd.load(
+                    context,
+                    adUnitId,
+                    request,
+                    object : AppOpenAd.AppOpenAdLoadCallback() {
+                        /**
+                         * Called when an app open ad has loaded.
+                         *
+                         * @param ad the loaded app open ad.
+                         */
+                        override fun onAdLoaded(ad: AppOpenAd) {
+                            appOpenAd = ContentAd.AdmobAd.ApAppOpenAd(ad)
+                            isLoadingAd = false
+                            loadTime = Date().time
+                            Log.e(TAG, "onAdLoaded: ")
 
-                    try{
-                        ad.setOnPaidEventListener {
-                            val loadedAdapterResponseInfo: AdapterResponseInfo? = ad.responseInfo?.loadedAdapterResponseInfo
-                            val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-                            adRevenue.setRevenue(it.valueMicros / 1000000.0, it.currencyCode)
-                            adRevenue.setAdRevenuePlacement("AppOpen")
-                            if (loadedAdapterResponseInfo != null) {
-                                adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+                            try {
+                                ad.setOnPaidEventListener {
+                                    val loadedAdapterResponseInfo: AdapterResponseInfo? =
+                                        ad.responseInfo?.loadedAdapterResponseInfo
+                                    val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+                                    adRevenue.setRevenue(
+                                        it.valueMicros / 1000000.0,
+                                        it.currencyCode
+                                    )
+                                    adRevenue.setAdRevenuePlacement("AppOpen")
+                                    if (loadedAdapterResponseInfo != null) {
+                                        adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+                                    }
+                                    Adjust.trackAdRevenue(adRevenue)
+                                }
+                            } catch (_: Exception) {
                             }
-                            Adjust.trackAdRevenue(adRevenue)
+
+
                         }
-                    }catch (_:Exception){}
 
-
-                }
-
-                /**
-                 * Called when an app open ad has failed to load.
-                 *
-                 * @param loadAdError the error.
-                 */
-                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                    isLoadingAd = false
-                    Log.d(TAG, "onAdFailedToLoad: " + loadAdError.message)
-                }
+                        /**
+                         * Called when an app open ad has failed to load.
+                         *
+                         * @param loadAdError the error.
+                         */
+                        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            isLoadingAd = false
+                            Log.d(TAG, "onAdFailedToLoad: " + loadAdError.message)
+                        }
+                    }
+                )
             }
-        )
+
+            NetworkProvider.MAX -> {
+                val maxAppOpenAd = MaxAppOpenAd(adUnitId, context)
+
+                maxAppOpenAd.setListener(object : MaxAdListener {
+                    override fun onAdLoaded(ad: MaxAd) {
+                        isLoadingAd = false
+                        loadTime = Date().time
+                        appOpenAd = ContentAd.MaxContentAd.ApAppOpenAd(maxAppOpenAd)
+                        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
+                        adjustAdRevenue.setRevenue(ad.revenue, "USD")
+                        adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+                        adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+                        adjustAdRevenue.setAdRevenuePlacement(ad.placement)
+                        Adjust.trackAdRevenue(adjustAdRevenue)
+                    }
+
+                    override fun onAdDisplayed(p0: MaxAd) {
+
+                    }
+
+                    override fun onAdHidden(p0: MaxAd) {
+
+                    }
+
+                    override fun onAdClicked(p0: MaxAd) {
+
+                    }
+
+                    override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                        isLoadingAd = false
+                        Log.d(TAG, "onAdFailedToLoad: " + p1.message)
+                    }
+
+                    override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
+
+                    }
+
+                })
+                maxAppOpenAd.setRevenueListener { }
+
+                // Load the first ad.
+                maxAppOpenAd.loadAd()
+            }
+        }
+
     }
 
     /** Check if ad was loaded more than n hours ago. */
@@ -135,43 +196,92 @@ class AppOpenAdManager {
         }
 
         Log.d(TAG, "Will show ad.")
+        when (appOpenAd) {
+            is ContentAd.AdmobAd.ApAppOpenAd -> {
+                (appOpenAd as ContentAd.AdmobAd.ApAppOpenAd).appOpenAd.fullScreenContentCallback =
+                    object : FullScreenContentCallback() {
+                        /** Called when full screen content is dismissed. */
+                        override fun onAdDismissedFullScreenContent() {
+                            // Set the reference to null so isAdAvailable() returns false.
+                            appOpenAd = null
+                            isShowingAd = false
+                            adCallback.onAppOpenAdClose()
+                            Log.d(TAG, "onAdDismissedFullScreenContent.")
+                            loadAd(activity)
+                        }
 
-        appOpenAd?.fullScreenContentCallback =
-            object : FullScreenContentCallback() {
-                /** Called when full screen content is dismissed. */
-                override fun onAdDismissedFullScreenContent() {
-                    // Set the reference to null so isAdAvailable() returns false.
-                    appOpenAd = null
-                    isShowingAd = false
-                    adCallback.onAppOpenAdClose()
-                    Log.d(TAG, "onAdDismissedFullScreenContent.")
-                }
+                        /** Called when fullscreen content failed to show. */
+                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                            appOpenAd = null
+                            isShowingAd = false
+                            adCallback.onAdFailedToShow(adError)
+                            Log.d(TAG, "onAdFailedToShowFullScreenContent: " + adError.message)
+                            loadAd(activity)
+                        }
 
-                /** Called when fullscreen content failed to show. */
-                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                    appOpenAd = null
-                    isShowingAd = false
-                    adCallback.onAdFailedToShow(adError)
-                    Log.d(TAG, "onAdFailedToShowFullScreenContent: " + adError.message)
-                }
+                        /** Called when fullscreen content is shown. */
+                        override fun onAdShowedFullScreenContent() {
+                            adCallback.onAppOpenAdShow()
+                            Log.d(TAG, "onAdShowedFullScreenContent.")
+                        }
 
-                /** Called when fullscreen content is shown. */
-                override fun onAdShowedFullScreenContent() {
-                    adCallback.onAppOpenAdShow()
-                    Log.d(TAG, "onAdShowedFullScreenContent.")
-                }
+                        override fun onAdClicked() {
+                            super.onAdClicked()
+                            adCallback.onAdClicked()
+                        }
 
-                override fun onAdClicked() {
-                    super.onAdClicked()
-                    adCallback.onAdClicked()
-                }
+                        override fun onAdImpression() {
+                            super.onAdImpression()
+                            adCallback.onAdImpression()
+                        }
+                    }
+                isShowingAd = true
+                (appOpenAd as ContentAd.AdmobAd.ApAppOpenAd).appOpenAd.show(activity)
+            }
 
-                override fun onAdImpression() {
-                    super.onAdImpression()
-                    adCallback.onAdImpression()
+            is ContentAd.MaxContentAd.ApAppOpenAd -> {
+                if ((appOpenAd as ContentAd.MaxContentAd.ApAppOpenAd).appOpenAd.isReady) {
+                    (appOpenAd as ContentAd.MaxContentAd.ApAppOpenAd).appOpenAd.setListener(object : MaxAdListener{
+                        override fun onAdLoaded(p0: MaxAd) {
+
+                        }
+
+                        override fun onAdDisplayed(p0: MaxAd) {
+                            adCallback.onAppOpenAdShow()
+                            Log.d(TAG, "onAdShowedFullScreenContent.")
+                        }
+
+                        override fun onAdHidden(p0: MaxAd) {
+                            appOpenAd = null
+                            isShowingAd = false
+                            adCallback.onAppOpenAdClose()
+                            Log.d(TAG, "onAdDismissedFullScreenContent.")
+                            loadAd(activity)
+                        }
+
+                        override fun onAdClicked(p0: MaxAd) {
+                            adCallback.onAdClicked()
+                        }
+
+                        override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                        }
+
+                        override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
+                            appOpenAd = null
+                            isShowingAd = false
+                            adCallback.onAdFailedToShow(p1.toAdError())
+                            Log.d(TAG, "onAdFailedToShowFullScreenContent: " + p1.message)
+                            loadAd(activity)
+                        }
+
+                    })
+                    (appOpenAd as ContentAd.MaxContentAd.ApAppOpenAd).appOpenAd.showAd()
                 }
             }
-        isShowingAd = true
-        appOpenAd?.show(activity)
+
+            else -> {
+                Log.d(TAG, "Not Show Ads")
+            }
+        }
     }
 }

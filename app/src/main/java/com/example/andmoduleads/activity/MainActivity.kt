@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
     private val rewardAdHelper by lazy {
-        val rewardAdConfig = RewardAdConfig("7acc879a59a089aa", 1, true, true)
+        val rewardAdConfig = RewardAdConfig("f67842c7460f9215", 1, true, true)
         RewardAdHelper(
             this, this, rewardAdConfig
         ).apply {
