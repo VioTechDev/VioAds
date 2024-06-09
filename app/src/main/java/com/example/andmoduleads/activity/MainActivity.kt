@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         binding?.flShimemr?.let {
             nativeAdHelper.setShimmerLayoutView(it.shimmerContainerNative)
         }
-        nativeAdHelper.requestAds(NativeAdParam.Request)
+        //nativeAdHelper.requestAds(NativeAdParam.Request)
         rewardAdHelper.requestAds(RewardAdParam.Request)
         interAdHelper.requestAds(InterstitialAdParam.Request)
         rewardAdHelper.registerAdListener(object : RewardAdCallBack {
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
         val nativeAdapterConfig = adapter?.let {
             NativeAdapterConfig.Builder(
-                "ca-app-pub-4584260126367940/2523808402",
+                "c2b390cda8403c0a",
                 it,
                 R.layout.item_native_ad,
                 R.layout.native_exit1,
