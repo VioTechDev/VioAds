@@ -2,6 +2,9 @@ package com.ads.admob.helper.banner.factory.max
 
 import android.content.Context
 import android.util.Log
+import com.adjust.sdk.Adjust
+import com.adjust.sdk.AdjustAdRevenue
+import com.adjust.sdk.AdjustConfig
 import com.ads.admob.data.ContentAd
 import com.ads.admob.listener.BannerAdCallBack
 import com.ads.admob.toAdError
@@ -57,7 +60,15 @@ class MaxBannerFactoryImpl : MaxBannerFactory {
                 }
 
             })
-            adView.setRevenueListener { }
+            adView.setRevenueListener {ad->
+                val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
+                adjustAdRevenue.setRevenue(ad.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+                adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(ad.placement)
+
+                Adjust.trackAdRevenue(adjustAdRevenue)
+            }
             adView.loadAd()
         } catch (ex: Exception) {
             adCallback.onAdFailedToLoad(
