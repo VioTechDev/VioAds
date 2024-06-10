@@ -47,7 +47,7 @@ class MyApplication : Application() {
         val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  false).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
-            .mediationProvider(NetworkProvider.MAX)
+            .mediationProvider(NetworkProvider.MIX)
             .listTestDevices(arrayListOf("FBDA72C75E0671544A38367B5AACCEC7"))
             .build()
         AdmobFactory.INSTANCE.initAdmob(this, vioAdConfig)

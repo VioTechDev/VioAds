@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("TAG", "onCreate: ")
             bannerAdHelper.setBannerContentView(it)
         }
-        //bannerAdHelper.requestAds(BannerAdParam.Request)
+        bannerAdHelper.requestAds(BannerAdParam.Request)
         val list: MutableList<String> = ArrayList()
         for (i in 0..29) {
             list.add("Let's save the world $i")

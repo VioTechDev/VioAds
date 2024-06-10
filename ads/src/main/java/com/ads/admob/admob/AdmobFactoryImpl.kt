@@ -25,6 +25,7 @@ import com.ads.admob.helper.interstitial.factory.admob.AdmobInterstitialAdFactor
 import com.ads.admob.helper.interstitial.factory.max.MaxInterstitialAdFactory
 import com.ads.admob.helper.reward.factory.admob.AdmobRewardAdFactory
 import com.ads.admob.helper.reward.factory.max.MaxRewardAdFactory
+import com.ads.admob.idToNetworkProvider
 import com.ads.admob.listener.BannerAdCallBack
 import com.ads.admob.listener.InterstitialAdCallback
 import com.ads.admob.listener.NativeAdCallback
@@ -38,7 +39,6 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.initialization.InitializationStatus
-import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.rewarded.RewardItem
 
 /**
@@ -60,29 +60,56 @@ class AdmobFactoryImpl : AdmobFactory {
                 WebView.setDataDirectorySuffix(processName)
             }
         }
-        if (vioAdConfig.provider == NetworkProvider.MAX) {
-            AppLovinSdk.getInstance(context).settings.testDeviceAdvertisingIds = arrayListOf("ffd0b4a3-9a3e-4745-89d1-43ce7b321bfe")
-
-            AppLovinSdk.getInstance(context).mediationProvider = "max"
-            AppLovinSdk.initializeSdk(context) { configuration: AppLovinSdkConfiguration? ->
-                // AppLovin SDK is initialized, start loading ads
-            }
-        } else {
-            MobileAds.initialize(context) { initializationStatus: InitializationStatus ->
-                val statusMap = initializationStatus.adapterStatusMap
-                for (adapterClass in statusMap.keys) {
-                    val status = statusMap[adapterClass]
-                    Log.d(
-                        TAG, String.format(
-                            "Adapter name: %s, Description: %s, Latency: %d",
-                            adapterClass, status!!.description, status.latency
+        when(vioAdConfig.provider){
+            NetworkProvider.ADMOB -> {
+                MobileAds.initialize(context) { initializationStatus: InitializationStatus ->
+                    val statusMap = initializationStatus.adapterStatusMap
+                    for (adapterClass in statusMap.keys) {
+                        val status = statusMap[adapterClass]
+                        Log.d(
+                            TAG, String.format(
+                                "Adapter name: %s, Description: %s, Latency: %d",
+                                adapterClass, status!!.description, status.latency
+                            )
                         )
-                    )
+                    }
+                }
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder().setTestDeviceIds(adConfig.listDevices).build()
+                )
+            }
+            NetworkProvider.MAX -> {
+                AppLovinSdk.getInstance(context).settings.testDeviceAdvertisingIds = arrayListOf("ffd0b4a3-9a3e-4745-89d1-43ce7b321bfe")
+
+                AppLovinSdk.getInstance(context).mediationProvider = "max"
+                AppLovinSdk.initializeSdk(context) { configuration: AppLovinSdkConfiguration? ->
+                    // AppLovin SDK is initialized, start loading ads
                 }
             }
-            MobileAds.setRequestConfiguration(
-                RequestConfiguration.Builder().setTestDeviceIds(adConfig.listDevices).build()
-            )
+            NetworkProvider.MIX -> {
+                MobileAds.initialize(context) { initializationStatus: InitializationStatus ->
+                    val statusMap = initializationStatus.adapterStatusMap
+                    for (adapterClass in statusMap.keys) {
+                        val status = statusMap[adapterClass]
+                        Log.d(
+                            TAG, String.format(
+                                "Adapter name: %s, Description: %s, Latency: %d",
+                                adapterClass, status!!.description, status.latency
+                            )
+                        )
+                    }
+                }
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder().setTestDeviceIds(adConfig.listDevices).build()
+                )
+                AppLovinSdk.getInstance(context).settings.testDeviceAdvertisingIds = arrayListOf("ffd0b4a3-9a3e-4745-89d1-43ce7b321bfe")
+
+                AppLovinSdk.getInstance(context).mediationProvider = "max"
+                AppLovinSdk.initializeSdk(context) { configuration: AppLovinSdkConfiguration? ->
+                    // AppLovin SDK is initialized, start loading ads
+                }
+            }
+
         }
         setupAdjust(context, adConfig.vioAdjustConfig)
     }
@@ -182,7 +209,7 @@ class AdmobFactoryImpl : AdmobFactory {
         useInlineAdaptive: Boolean,
         adCallback: BannerAdCallBack
     ) {
-        when (vioAdConfig.provider) {
+        when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
                 AdmobBannerFactory.getInstance()
                     .requestBannerAd(
@@ -270,7 +297,7 @@ class AdmobFactoryImpl : AdmobFactory {
         adId: String,
         adCallback: NativeAdCallback
     ) {
-        when(vioAdConfig.provider){
+        when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
                 AdmobNativeFactory.getInstance().requestNativeAd(context, adId, object : NativeAdCallback{
                     override fun populateNativeAd() {
@@ -383,7 +410,7 @@ class AdmobFactoryImpl : AdmobFactory {
         adId: String,
         adCallback: InterstitialAdCallback
     ) {
-        when (vioAdConfig.provider) {
+        when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
                 AdmobInterstitialAdFactory.getInstance()
                     .requestInterstitialAd(context, adId, object : InterstitialAdCallback {
@@ -502,7 +529,7 @@ class AdmobFactoryImpl : AdmobFactory {
     }
 
     override fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack) {
-        when (vioAdConfig.provider) {
+        when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
                 AdmobRewardAdFactory.getInstance()
                     .requestRewardAd(context, adId, object : RewardAdCallBack {
