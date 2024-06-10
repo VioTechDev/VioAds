@@ -8,6 +8,7 @@ import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
 import com.ads.admob.config.NetworkProvider
 import com.ads.admob.data.ContentAd
+import com.ads.admob.idToNetworkProvider
 import com.ads.admob.listener.AppOpenAdCallBack
 import com.ads.admob.toAdError
 import com.applovin.mediation.MaxAd
@@ -54,7 +55,7 @@ class AppOpenAdManager(private val networkManager: Int) {
         }
 
         isLoadingAd = true
-        when (networkManager) {
+        when (adUnitId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
                 val request = AdRequest.Builder().build()
                 AppOpenAd.load(
