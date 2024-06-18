@@ -24,6 +24,7 @@ sealed class ContentAd {
         data class ApRewardInterAd(val rewardedInterstitialAd: RewardedInterstitialAd) : AdmobAd()
         data class ApInterstitialAd(val interstitialAd: InterstitialAd) : AdmobAd()
         data class ApAppOpenAd(val appOpenAd: AppOpenAd) : AdmobAd()
+        data class ApAppResumeAd(val appOpenAd: AppOpenAd) : AdmobAd()
         data class ApBannerAd(val adView: AdView) : AdmobAd()
     }
 
@@ -33,6 +34,7 @@ sealed class ContentAd {
         data class ApRewardAd(val rewardAd: MaxRewardedAd) : MaxContentAd()
         data class ApNativeAd(val maxNativeAdLoader: MaxNativeAdLoader, val nativeAd: MaxAd) : MaxContentAd()
         data class ApAppOpenAd(val appOpenAd: MaxAppOpenAd) : MaxContentAd()
+        data class ApAppResumeAd(val appOpenAd: MaxAd) : MaxContentAd()
 
     }
 }

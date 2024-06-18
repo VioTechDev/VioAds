@@ -7,12 +7,16 @@ import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.config.NetworkProvider
 import com.ads.admob.config.VioAdConfig
 import com.ads.admob.config.VioAdjustConfig
+import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.appoppen.AppResumeAdConfig
 import com.ads.admob.helper.appoppen.AppResumeAdHelper
+import com.ads.admob.listener.AppOpenAdCallBack
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkConfiguration
 import com.example.andmoduleads.activity.SplashActivity
 import com.google.android.gms.ads.AdActivity
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
 
 
 class MyApplication : Application() {
@@ -41,7 +45,36 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        initAppOpenAd()
+        initAppOpenAd().registerAdListener(object : AppOpenAdCallBack{
+            override fun onAppOpenAdShow() {
+                Log.e(TAG, "onAppOpenAdShow: ", )
+            }
+
+            override fun onAppOpenAdClose() {
+                Log.e(TAG, "onAppOpenAdClose: ", )
+            }
+
+            override fun onAdLoaded(data: ContentAd) {
+                Log.e(TAG, "onAdLoaded: ", )
+            }
+
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                Log.e(TAG, "onAdFailedToLoad: ", )
+            }
+
+            override fun onAdClicked() {
+                Log.e(TAG, "onAdClicked: ", )
+            }
+
+            override fun onAdImpression() {
+                Log.e(TAG, "onAdImpression: ", )
+            }
+
+            override fun onAdFailedToShow(adError: AdError) {
+                Log.e(TAG, "onAdFailedToShow: ", )
+            }
+
+        })
         val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  false).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
