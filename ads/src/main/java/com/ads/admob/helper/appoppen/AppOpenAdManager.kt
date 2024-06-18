@@ -11,6 +11,7 @@ import com.ads.admob.data.ContentAd
 import com.ads.admob.idToNetworkProvider
 import com.ads.admob.listener.AppOpenAdCallBack
 import com.ads.admob.toAdError
+import com.ads.admob.toLoadAdError
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxAdListener
 import com.applovin.mediation.MaxError
@@ -40,8 +41,12 @@ class AppOpenAdManager(private val networkManager: Int) {
     fun setAppResumeConfig(adConfig: AppResumeAdConfig) {
         appResumeAdConfig = adConfig
     }
+    private var appOpenAdCallBack: AppOpenAdCallBack? = null
     fun setAdUnitId(id: String){
         this.adUnitId = id
+    }
+    fun registerLister(appOpenAdCallBack: AppOpenAdCallBack) {
+        this.appOpenAdCallBack = appOpenAdCallBack
     }
 
     /** Keep track of the time an app open ad is loaded to ensure you don't show an expired ad. */
@@ -74,6 +79,7 @@ class AppOpenAdManager(private val networkManager: Int) {
                          * @param ad the loaded app open ad.
                          */
                         override fun onAdLoaded(ad: AppOpenAd) {
+                            appOpenAdCallBack?.onAdLoaded(ContentAd.AdmobAd.ApAppResumeAd(ad))
                             appOpenAd = ContentAd.AdmobAd.ApAppOpenAd(ad)
                             isLoadingAd = false
                             loadTime = Date().time
@@ -107,6 +113,7 @@ class AppOpenAdManager(private val networkManager: Int) {
                          */
                         override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                             isLoadingAd = false
+                            appOpenAdCallBack?.onAdFailedToLoad(loadAdError)
                             Log.d(TAG, "onAdFailedToLoad: " + loadAdError.message)
                         }
                     }
@@ -118,6 +125,7 @@ class AppOpenAdManager(private val networkManager: Int) {
 
                 maxAppOpenAd.setListener(object : MaxAdListener {
                     override fun onAdLoaded(ad: MaxAd) {
+                        appOpenAdCallBack?.onAdLoaded(ContentAd.MaxContentAd.ApAppResumeAd(ad))
                         isLoadingAd = false
                         loadTime = Date().time
                         appOpenAd = ContentAd.MaxContentAd.ApAppOpenAd(maxAppOpenAd)
@@ -142,6 +150,7 @@ class AppOpenAdManager(private val networkManager: Int) {
                     }
 
                     override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                        appOpenAdCallBack?.onAdFailedToLoad(p1.toLoadAdError())
                         isLoadingAd = false
                         Log.d(TAG, "onAdFailedToLoad: " + p1.message)
                     }

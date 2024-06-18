@@ -61,6 +61,50 @@ class AppResumeAdHelper(
         appOpenAdManager = AppOpenAdManager(config.networkProvider)
         appOpenAdManager?.setAdUnitId(config.idAds)
         appOpenAdManager?.setAppResumeConfig(config)
+        appOpenAdManager?.registerLister(object : AppOpenAdCallBack {
+            override fun onAppOpenAdShow() {
+                invokeAdListener {
+                    it.onAppOpenAdShow()
+                }
+            }
+
+            override fun onAppOpenAdClose() {
+                invokeAdListener {
+                    it.onAppOpenAdClose()
+                }
+            }
+
+            override fun onAdLoaded(data: ContentAd) {
+                invokeAdListener {
+                    it.onAdLoaded(data)
+                }
+            }
+
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                invokeAdListener {
+                    it.onAdFailedToLoad(loadAdError)
+                }
+            }
+
+            override fun onAdClicked() {
+                invokeAdListener {
+                    it.onAdClicked()
+                }
+            }
+
+            override fun onAdImpression() {
+                invokeAdListener {
+                    it.onAdImpression()
+                }
+            }
+
+            override fun onAdFailedToShow(adError: AdError) {
+                invokeAdListener {
+                    it.onAdFailedToShow(adError)
+                }
+            }
+
+        })
         application.registerActivityLifecycleCallbacks(this)
     }
 
@@ -191,7 +235,7 @@ class AppResumeAdHelper(
                 invokeAdListener { it.onAppOpenAdClose() }
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApAppOpenAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 invokeAdListener { it.onAdLoaded(data) }
             }
 
