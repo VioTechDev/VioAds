@@ -3,9 +3,6 @@ package com.ads.admob.helper.adnative.params
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.ads.mediation.applovin.AppLovinMediationAdapter
 import com.google.ads.mediation.facebook.FacebookMediationAdapter
-import com.google.ads.mediation.mintegral.MintegralMediationAdapter
-import com.google.ads.mediation.pangle.PangleMediationAdapter
-import com.google.ads.mediation.vungle.VungleMediationAdapter
 import com.google.android.gms.ads.nativead.NativeAd
 
 /**
@@ -19,10 +16,7 @@ import com.google.android.gms.ads.nativead.NativeAd
 enum class AdNativeMediation(val clazz: Class<*>) {
     ADMOB(AdMobAdapter::class.java),
     FACEBOOK(FacebookMediationAdapter::class.java),
-    APPLOVIN(AppLovinMediationAdapter::class.java),
-    MINTEGRAL(MintegralMediationAdapter::class.java),
-    PANGLE(PangleMediationAdapter::class.java),
-    VUNGLE(VungleMediationAdapter::class.java);
+    APPLOVIN(AppLovinMediationAdapter::class.java);
 
     companion object {
         /**
