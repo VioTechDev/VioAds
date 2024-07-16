@@ -68,7 +68,10 @@ class InterstitialAdHelper(
                     }
                 }
             } else {
-                invokeAdListener { it.onNextAction() }
+                lifecycleOwner.lifecycleScope.launch {
+                    adInterstitialState.emit(AdInterstitialState.Fail)
+                }
+                invokeAdListener { it.onAdFailedToLoad(LoadAdError(99, "Request Invalid", "", null, null)) }
             }
         }
     }

@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import arrow.atomic.AtomicBoolean
 import com.ads.admob.AdmobManager
 import com.ads.admob.data.ContentAd
 import com.ads.admob.dialog.LoadingAdsDialog
@@ -22,11 +23,11 @@ import java.util.concurrent.CopyOnWriteArrayList
  */
 
 class AppResumeAdHelper(
-    application: Application,
+    private val application: Application,
     private val lifecycleOwner: LifecycleOwner,
     private val config: AppResumeAdConfig
 ) : LifecycleObserver, Application.ActivityLifecycleCallbacks {
-    private var appOpenAdManager: AppOpenAdManager
+    private var appOpenAdManager: AppOpenAdManager? = null
     private var isActivityInValid = false
     private var isDisableAppResumeOnScreen = false
     private var isDisableAppResumeByClickAction = false
@@ -58,8 +59,8 @@ class AppResumeAdHelper(
     init {
         lifecycleOwner.lifecycle.addObserver(this)
         appOpenAdManager = AppOpenAdManager()
-        appOpenAdManager.setAdUnitId(config.idAds)
-        appOpenAdManager.loadAd(application)
+        appOpenAdManager?.setAdUnitId(config.idAds)
+        appOpenAdManager?.setAppResumeConfig(config)
         application.registerActivityLifecycleCallbacks(this)
     }
 
@@ -126,20 +127,22 @@ class AppResumeAdHelper(
             oldActivity = activity
             isFistResumeApp = true
         }
-        if (isFistResumeApp) {
-            isFistResumeApp = false
-            return
-        }
-        if (appOpenAdManager.isAdAvailable()) {
+//        if (isFistResumeApp) {
+//            isFistResumeApp = false
+//            Log.e(TAG, "handleShowAppOpenResume: 32", )
+//            return
+//        }
+        if (appOpenAdManager?.isAdAvailable() == true) {
             lifecycleOwner.lifecycleScope.launch {
                 showDialogLoading(activity)
                 delay(800)
-                appOpenAdManager.showAdIfAvailable(activity, invokeListenerAdCallback())
+                appOpenAdManager?.showAdIfAvailable(activity, invokeListenerAdCallback())
             }
         }
     }
 
     override fun onActivityPaused(p0: Activity) {
+        appOpenAdManager?.loadAd(application)
     }
 
     override fun onActivityStopped(activity: Activity) {

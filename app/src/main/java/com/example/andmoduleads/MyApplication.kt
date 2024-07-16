@@ -20,6 +20,7 @@ class MyApplication : Application() {
     private val EVENT_AD_IMPRESSION_ADJUST = "gzel1k"
     private val TAG = "MainApplication"
 
+
     private fun initAppOpenAd(): AppResumeAdHelper {
         val listClassInValid = mutableListOf<Class<*>>()
         listClassInValid.add(AdActivity::class.java)
@@ -27,7 +28,7 @@ class MyApplication : Application() {
         val config = AppResumeAdConfig(
             idAds = "ca-app-pub-3940256099942544/9257395921",
             listClassInValid = listClassInValid,
-            canShowAds = false
+            canShowAds = true
         )
         return AppResumeAdHelper(
             application = this,
@@ -39,7 +40,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         application = this
-        initAppOpenAd().setRequestAppResumeValid(false)
+        appResumeAdHelper = initAppOpenAd()
         val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  false).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
@@ -50,6 +51,8 @@ class MyApplication : Application() {
     }
     companion object {
         var application: MyApplication? = null
+            private set
+        var appResumeAdHelper : AppResumeAdHelper? = null
             private set
     }
 }

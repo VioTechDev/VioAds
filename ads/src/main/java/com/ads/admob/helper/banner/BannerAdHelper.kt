@@ -263,22 +263,27 @@ class BannerAdHelper(
         return object : BannerAdCallBack {
             override fun onAdLoaded(data: ContentAd.AdmobAd.ApBannerAd) {
                 invokeAdListener { it.onAdLoaded(data) }
+                logZ("onAdLoaded")
             }
 
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                 invokeAdListener { it.onAdFailedToLoad(loadAdError) }
+                logZ("onAdFailedToLoad: ${loadAdError.message}")
             }
 
             override fun onAdClicked() {
                 invokeAdListener { it.onAdClicked() }
+                logZ("onAdClicked")
             }
 
             override fun onAdImpression() {
                 invokeAdListener { it.onAdImpression() }
+                logZ("onAdImpression")
             }
 
             override fun onAdFailedToShow(adError: AdError) {
                 invokeAdListener { it.onAdFailedToShow(adError) }
+                logZ("onAdFailedToShow: ${adError.message}")
             }
         }
     }

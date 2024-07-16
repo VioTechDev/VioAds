@@ -8,6 +8,7 @@ import com.ads.admob.helper.interstitial.InterstitialAdSplashConfig
 import com.ads.admob.helper.interstitial.InterstitialAdSplashHelper
 import com.ads.admob.helper.interstitial.params.InterstitialAdParam
 import com.ads.admob.listener.InterstitialAdCallback
+import com.example.andmoduleads.MyApplication
 import com.example.andmoduleads.R
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
@@ -39,10 +40,12 @@ class SplashActivity : AppCompatActivity() {
     private val interAdCallBack = object : InterstitialAdCallback {
         override fun onNextAction() {
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            finish()
         }
 
         override fun onAdClose() {
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            finish()
         }
 
         override fun onInterstitialShow() {
@@ -67,9 +70,14 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+        MyApplication.appResumeAdHelper?.setDisableAppResumeOnScreen()
         interAdSplashHelper.requestAds(InterstitialAdParam.Request)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        MyApplication.appResumeAdHelper?.setEnableAppResumeOnScreen()
+    }
     companion object {
         private const val TAG = "VioAds"
     }

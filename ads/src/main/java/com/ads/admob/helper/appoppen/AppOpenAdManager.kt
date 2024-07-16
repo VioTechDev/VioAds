@@ -6,14 +6,13 @@ import android.util.Log
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
-import com.ads.admob.AdmobManager
+import com.ads.admob.listener.AppOpenAdCallBack
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdapterResponseInfo
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
-import com.ads.admob.listener.AppOpenAdCallBack
 import java.util.Date
 
 /**
@@ -29,6 +28,10 @@ class AppOpenAdManager {
     private var isLoadingAd = false
     var isShowingAd = false
     private var adUnitId = ""
+    private var appResumeAdConfig: AppResumeAdConfig? = null
+    fun setAppResumeConfig(adConfig: AppResumeAdConfig) {
+        appResumeAdConfig = adConfig
+    }
     fun setAdUnitId(id: String){
         this.adUnitId = id
     }
@@ -43,10 +46,11 @@ class AppOpenAdManager {
      */
     fun loadAd(context: Context) {
         // Do not load ad if there is an unused ad or one is already loading.
-        if (isLoadingAd || isAdAvailable()) {
+        if (isLoadingAd || isAdAvailable() || appResumeAdConfig?.canShowAds == false || appOpenAd != null) {
+            Log.e(TAG, "loadAd: invalid", )
             return
         }
-
+        Log.e(TAG, "loadAd: Valid", )
         isLoadingAd = true
         val request = AdRequest.Builder().build()
         AppOpenAd.load(
@@ -141,7 +145,6 @@ class AppOpenAdManager {
                     isShowingAd = false
                     adCallback.onAppOpenAdClose()
                     Log.d(TAG, "onAdDismissedFullScreenContent.")
-                    loadAd(activity)
                 }
 
                 /** Called when fullscreen content failed to show. */
@@ -150,7 +153,6 @@ class AppOpenAdManager {
                     isShowingAd = false
                     adCallback.onAdFailedToShow(adError)
                     Log.d(TAG, "onAdFailedToShowFullScreenContent: " + adError.message)
-                    loadAd(activity)
                 }
 
                 /** Called when fullscreen content is shown. */
