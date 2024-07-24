@@ -13,6 +13,7 @@ data class BannerAdConfig(
     override val canReloadAds: Boolean,
     val bannerInlineStyle: Int = BannerInlineStyle.SMALL_STYLE,
     val useInlineAdaptive: Boolean = false,
+    val adPlacement: String? = null
 ) : IAdsConfig {
     var collapsibleGravity: String? = null
 }

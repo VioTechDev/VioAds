@@ -10,5 +10,6 @@ class InterstitialAdSplashConfig(
     val timeDelay: Long,
     val showReady: Boolean = false,
     override val canShowAds: Boolean,
-    override val canReloadAds: Boolean
+    override val canReloadAds: Boolean,
+    val adPlacement: String? = null
 ) : IAdsConfig

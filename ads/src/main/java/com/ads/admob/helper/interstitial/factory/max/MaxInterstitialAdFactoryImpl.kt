@@ -21,9 +21,10 @@ class MaxInterstitialAdFactoryImpl : MaxInterstitialAdFactory {
     override fun requestInterstitialAd(
         context: Context,
         adId: String,
-        adCallback: InterstitialAdCallback
+        adCallback: InterstitialAdCallback,
+        adPlacement: String?
     ) {
-
+        FirebaseAnalyticsHelper.logEventAdPlacement(context, adPlacement, adId)
         val interstitialAd = MaxInterstitialAd(adId, context as Activity)
         Log.d(TAG, "requestInterstitialAd: id $adId")
         interstitialAd.setListener(object : MaxAdListener {

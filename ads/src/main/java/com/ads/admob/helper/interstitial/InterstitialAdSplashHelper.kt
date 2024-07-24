@@ -99,7 +99,7 @@ class InterstitialAdSplashHelper(
     private fun createInterAds(activity: Activity) {
         requestTimeOutJob = lifecycleOwner.lifecycleScope.launch {
             AdmobFactory.INSTANCE
-                .requestInterstitialAds(activity, config.idAds, invokeListenerAdCallback())
+                .requestInterstitialAds(activity, config.idAds, invokeListenerAdCallback(), config.adPlacement)
             delay(config.timeOut)
             if (interstitialAdValue != null && config.showReady) {
                 showInterAds(activity)

@@ -11,5 +11,6 @@ class AppResumeAdConfig(
     val networkProvider: Int = NetworkProvider.ADMOB,
     val listClassInValid: MutableList<Class<*>> = arrayListOf(),
     override val canShowAds: Boolean = false,
-    override val canReloadAds: Boolean = false
+    override val canReloadAds: Boolean = false,
+    val adPlacement: String? = null
 ) : IAdsConfig

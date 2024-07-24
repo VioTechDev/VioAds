@@ -9,5 +9,6 @@ class InterstitialAdConfig(
     val showByTime: Int = 1,
     override val canShowAds: Boolean,
     override val canReloadAds: Boolean,
-    val currentTime: Int = 0
+    val currentTime: Int = 0,
+    val adPlacement: String? = null
 ) : IAdsConfig

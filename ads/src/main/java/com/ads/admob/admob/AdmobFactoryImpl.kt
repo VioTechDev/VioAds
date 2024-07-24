@@ -207,7 +207,8 @@ class AdmobFactoryImpl : AdmobFactory {
         collapsibleGravity: String?,
         bannerInlineStyle: Int,
         useInlineAdaptive: Boolean,
-        adCallback: BannerAdCallBack
+        adCallback: BannerAdCallBack,
+        adPlacement: String?
     ) {
         when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
@@ -285,7 +286,8 @@ class AdmobFactoryImpl : AdmobFactory {
                             override fun onAdFailedToShow(adError: AdError) {
                                 adCallback.onAdFailedToShow(adError)
                             }
-                        }
+                        },
+                        adPlacement
                     )
             }
         }
@@ -295,7 +297,8 @@ class AdmobFactoryImpl : AdmobFactory {
     override fun requestNativeAd(
         context: Context,
         adId: String,
-        adCallback: NativeAdCallback
+        adCallback: NativeAdCallback,
+        adPlacement: String?
     ) {
         when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
@@ -364,7 +367,9 @@ class AdmobFactoryImpl : AdmobFactory {
                         adCallback.onAdFailedToShow(adError)
                     }
 
-                })
+                },
+                    adPlacement
+                )
             }
         }
     }
@@ -408,7 +413,8 @@ class AdmobFactoryImpl : AdmobFactory {
     override fun requestInterstitialAds(
         context: Context,
         adId: String,
-        adCallback: InterstitialAdCallback
+        adCallback: InterstitialAdCallback,
+        adPlacement: String?
     ) {
         when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
@@ -500,7 +506,8 @@ class AdmobFactoryImpl : AdmobFactory {
                             adCallback.onAdFailedToShow(adError)
                         }
 
-                    })
+                    },
+                        adPlacement)
             }
         }
     }
@@ -528,7 +535,12 @@ class AdmobFactoryImpl : AdmobFactory {
 
     }
 
-    override fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack) {
+    override fun requestRewardAd(
+        context: Context,
+        adId: String,
+        adCallback: RewardAdCallBack,
+        adPlacement: String?
+    ) {
         when (adId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
                 AdmobRewardAdFactory.getInstance()
@@ -617,7 +629,8 @@ class AdmobFactoryImpl : AdmobFactory {
                         override fun onAdFailedToShow(adError: AdError) {
                             adCallback.onAdFailedToShow(adError)
                         }
-                    })
+                    },
+                        adPlacement)
 
             }
         }

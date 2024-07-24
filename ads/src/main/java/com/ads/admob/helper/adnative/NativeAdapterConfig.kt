@@ -14,6 +14,7 @@ class NativeAdapterConfig private constructor(
     val adItemInterval: Int,
     val isRepeat: Boolean = false,
     val forceReloadAdOnBind: Boolean = false,
+    val adPlacement: String? = null
 ) {
     class Builder(
         val nativeAdId: String,
@@ -25,7 +26,8 @@ class NativeAdapterConfig private constructor(
         private val adItemInterval: Int,
         private val isRepeat: Boolean = false,
         private val forceReloadAdOnBind: Boolean = false,
-    ) {
+        private val adPlacement: String? = null,
+        ) {
         fun build() = NativeAdapterConfig(
             nativeAdId,
             adapter,
@@ -35,7 +37,8 @@ class NativeAdapterConfig private constructor(
             gridLayoutManager,
             adItemInterval,
             isRepeat,
-            forceReloadAdOnBind
+            forceReloadAdOnBind,
+            adPlacement
         )
     }
 }

@@ -11,8 +11,9 @@ interface MaxBannerFactory {
     fun requestBannerAd(
         context: Context,
         adId: String,
-        adCallback: BannerAdCallBack
-    )
+        adCallback: BannerAdCallBack,
+        adPlacement: String? = null,
+        )
 
     companion object {
         @JvmStatic

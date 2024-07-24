@@ -133,7 +133,8 @@ class InterstitialAdHelper(
                     .requestInterstitialAds(
                         activity,
                         config.idAds,
-                        invokeListenerAdCallback()
+                        invokeListenerAdCallback(),
+                        config.adPlacement
                     )
             }
         }

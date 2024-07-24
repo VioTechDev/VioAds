@@ -38,6 +38,10 @@ class AppOpenAdManager(private val networkManager: Int) {
     private var isLoadingAd = false
     var isShowingAd = false
     private var adUnitId = ""
+    private var adConfig: AppResumeAdConfig? = null
+    fun setAdConfig(config: AppResumeAdConfig) {
+        adConfig = config
+    }
     private var appOpenAdCallBack: AppOpenAdCallBack? = null
     fun setAdUnitId(id: String){
         this.adUnitId = id
@@ -117,6 +121,11 @@ class AppOpenAdManager(private val networkManager: Int) {
             }
 
             NetworkProvider.MAX -> {
+                FirebaseAnalyticsHelper.logEventAdPlacement(
+                    context,
+                    adConfig?.adPlacement,
+                    adUnitId
+                )
                 val maxAppOpenAd = MaxAppOpenAd(adUnitId, context)
 
                 maxAppOpenAd.setListener(object : MaxAdListener {

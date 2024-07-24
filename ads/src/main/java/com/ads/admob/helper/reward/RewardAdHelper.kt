@@ -132,7 +132,8 @@ class RewardAdHelper(
                     .requestRewardAd(
                         activity,
                         config.idAds,
-                        invokeRewardAdCallback()
+                        invokeRewardAdCallback(),
+                        config.adPlacement
                     )
             }
         }

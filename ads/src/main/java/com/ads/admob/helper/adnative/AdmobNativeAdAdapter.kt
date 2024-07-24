@@ -127,7 +127,8 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
                     override fun onAdFailedToShow(adError: AdError) {
                     }
 
-                })
+                },
+                nativeAdapterConfig.adPlacement)
         }
     }
 

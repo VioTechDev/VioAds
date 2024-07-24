@@ -25,8 +25,10 @@ class MaxBannerFactoryImpl : MaxBannerFactory {
     override fun requestBannerAd(
         context: Context,
         adId: String,
-        adCallback: BannerAdCallBack
+        adCallback: BannerAdCallBack,
+        adPlacement: String?
     ) {
+        FirebaseAnalyticsHelper.logEventAdPlacement(context, adPlacement, adId)
         try {
             val adView = MaxAdView(adId, context)
             adView.setListener(object : MaxAdViewAdListener {

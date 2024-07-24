@@ -16,6 +16,7 @@ class NativeAdConfig(
     override val canShowAds: Boolean,
     override val canReloadAds: Boolean,
     @LayoutRes val layoutId: Int,
+    val adPlacement: String? = null
 ) : IAdsConfig {
     /**
      * List of layouts associated with different ad mediation types.

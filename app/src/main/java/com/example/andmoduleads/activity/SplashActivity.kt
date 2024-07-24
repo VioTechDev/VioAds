@@ -19,12 +19,13 @@ class SplashActivity : AppCompatActivity() {
     private val interAdSplashHelper by lazy { initInterAdSplash() }
     private fun initInterAdSplash(): InterstitialAdSplashHelper {
         val config = InterstitialAdSplashConfig(
-            idAds = "ca-app-pub-3940256099942544/1033173712",
+            idAds = "7172848836d13826",
             canShowAds = true,
             canReloadAds = true,
             timeDelay = 5000L,
             timeOut = 30000L,
-            showReady = true
+            showReady = true,
+            adPlacement = "splash"
         )
         return InterstitialAdSplashHelper(
             activity = this,

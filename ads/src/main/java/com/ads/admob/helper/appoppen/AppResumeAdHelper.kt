@@ -59,6 +59,7 @@ class AppResumeAdHelper(
         lifecycleOwner.lifecycle.addObserver(this)
         appOpenAdManager = AppOpenAdManager(config.networkProvider)
         appOpenAdManager.setAdUnitId(config.idAds)
+        appOpenAdManager.setAdConfig(config)
         appOpenAdManager.registerLister(object : AppOpenAdCallBack {
             override fun onAppOpenAdShow() {
                 invokeAdListener {

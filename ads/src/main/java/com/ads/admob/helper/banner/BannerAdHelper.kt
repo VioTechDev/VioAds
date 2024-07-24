@@ -192,7 +192,8 @@ class BannerAdHelper(
                     config.collapsibleGravity,
                     config.bannerInlineStyle,
                     config.useInlineAdaptive,
-                    invokeListenerAdCallback()
+                    invokeListenerAdCallback(),
+                    config.adPlacement
                 )
         }
     }

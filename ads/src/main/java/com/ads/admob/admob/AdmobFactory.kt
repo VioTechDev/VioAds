@@ -27,10 +27,11 @@ interface AdmobFactory {
         collapsibleGravity: String? = null,
         bannerInlineStyle: Int = BannerInlineStyle.SMALL_STYLE,
         useInlineAdaptive: Boolean = false,
-        adCallback: BannerAdCallBack
+        adCallback: BannerAdCallBack,
+        adPlacement: String? = null
     )
 
-    fun requestNativeAd(context: Context, adId: String, adCallback: NativeAdCallback)
+    fun requestNativeAd(context: Context, adId: String, adCallback: NativeAdCallback, adPlacement: String? = null)
 
     fun populateNativeAdView(
         activity: Context,
@@ -41,7 +42,7 @@ interface AdmobFactory {
         adCallback: NativeAdCallback
     )
 
-    fun requestInterstitialAds(context: Context, adId: String, adCallback: InterstitialAdCallback)
+    fun requestInterstitialAds(context: Context, adId: String, adCallback: InterstitialAdCallback, adPlacement: String? = null)
 
     fun showInterstitial(
         context: Context,
@@ -49,7 +50,7 @@ interface AdmobFactory {
         adCallback: InterstitialAdCallback
     )
 
-    fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack)
+    fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack, adPlacement: String? = null)
     fun showRewardAd(
         activity: Activity,
         rewardedAd: ContentAd,

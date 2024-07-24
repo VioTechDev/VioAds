@@ -7,7 +7,7 @@ import com.applovin.mediation.ads.MaxInterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAd
 
 interface MaxInterstitialAdFactory {
-    fun requestInterstitialAd(context: Context, adId: String, adCallback: InterstitialAdCallback)
+    fun requestInterstitialAd(context: Context, adId: String, adCallback: InterstitialAdCallback, adPlacement: String? = null)
     fun showInterstitial(
         context: Context,
         interstitialAd: MaxInterstitialAd?,

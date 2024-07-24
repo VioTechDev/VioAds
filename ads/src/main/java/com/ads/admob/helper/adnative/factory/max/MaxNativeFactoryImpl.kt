@@ -26,7 +26,13 @@ import com.google.android.gms.ads.AdError
  */
 class MaxNativeFactoryImpl : MaxNativeFactory {
     private val TAG = MaxNativeFactoryImpl::class.java.simpleName
-    override fun requestNativeAd(context: Context, adId: String, adCallback: NativeAdCallback) {
+    override fun requestNativeAd(
+        context: Context,
+        adId: String,
+        adCallback: NativeAdCallback,
+        adPlacement: String?
+    ) {
+        FirebaseAnalyticsHelper.logEventAdPlacement(context, adPlacement, adId)
         val nativeAdLoader = MaxNativeAdLoader(adId, context)
         nativeAdLoader.setRevenueListener { ad ->
             val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)

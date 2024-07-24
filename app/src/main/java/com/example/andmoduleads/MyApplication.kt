@@ -34,7 +34,8 @@ class MyApplication : Application() {
             idAds = "c2026e2d6ea47670",
             listClassInValid = listClassInValid,
             canShowAds = false,
-            networkProvider = NetworkProvider.MAX
+            networkProvider = NetworkProvider.MAX,
+            adPlacement = "APAO"
         )
         return AppResumeAdHelper(
             application = this,

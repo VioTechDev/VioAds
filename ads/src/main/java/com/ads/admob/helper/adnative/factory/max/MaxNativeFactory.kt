@@ -13,7 +13,7 @@ import com.applovin.mediation.nativeAds.MaxNativeAdView
  * Created by ViO on 16/03/2024.
  */
 interface MaxNativeFactory {
-    fun requestNativeAd(context: Context, adId: String, adCallback: NativeAdCallback)
+    fun requestNativeAd(context: Context, adId: String, adCallback: NativeAdCallback, adPlacement: String? = null)
 
     fun populateNativeAdView(
         activity: Context,

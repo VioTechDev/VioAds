@@ -48,7 +48,8 @@ class MainActivity : AppCompatActivity() {
             canShowAds = true,
             canReloadAds = true,
             showByTime = 1,
-            currentTime = 1
+            currentTime = 1,
+            adPlacement = "inter1"
         )
         return InterstitialAdHelper(
             activity = this,
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
     private val rewardAdHelper by lazy {
-        val rewardAdConfig = RewardAdConfig("f67842c7460f9215", 1, true, true)
+        val rewardAdConfig = RewardAdConfig("f67842c7460f9215", 1, true, true, adPlacement = "reward")
         RewardAdHelper(
             this, this, rewardAdConfig
         ).apply {
@@ -69,7 +70,8 @@ class MainActivity : AppCompatActivity() {
             "c2b390cda8403c0a",
             true,
             true,
-           R.layout.native_exit1
+           R.layout.native_exit1,
+            "native1"
         )
 
         NativeAdHelper(
@@ -186,7 +188,8 @@ class MainActivity : AppCompatActivity() {
                 gridLayoutManager,
                 4,
                 true,
-                false
+                false,
+                "null"
             ).build()
         }
         val admobNativeAdAdapter = nativeAdapterConfig?.let { AdmobNativeAdAdapter(it) }

@@ -20,7 +20,13 @@ import com.applovin.mediation.ads.MaxRewardedAd
 
 class MaxRewardAdFactoryImpl : MaxRewardAdFactory {
     private val TAG = "MaxRewardAdFactory"
-    override fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack) {
+    override fun requestRewardAd(
+        context: Context,
+        adId: String,
+        adCallback: RewardAdCallBack,
+        adPlacement: String?
+    ) {
+        FirebaseAnalyticsHelper.logEventAdPlacement(context, adPlacement, adId)
         Log.e(TAG, "requestRewardAd: ", )
         val rewardedAd = MaxRewardedAd.getInstance(adId, context as Activity)
         rewardedAd.setListener(object : MaxRewardedAdListener {
@@ -70,8 +76,9 @@ class MaxRewardAdFactoryImpl : MaxRewardAdFactory {
     override fun requestRewardInterAd(
         context: Context,
         adId: String,
-        adCallback: RewardInterAdCallBack
-    ) {
+        adCallback: RewardInterAdCallBack,
+        adPlacement: String?,
+        ) {
 
     }
 
