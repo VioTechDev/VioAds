@@ -6,6 +6,7 @@ import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
 import com.ads.admob.data.ContentAd
+import com.ads.admob.event.FirebaseAnalyticsHelper
 import com.ads.admob.listener.BannerAdCallBack
 import com.ads.admob.toAdError
 import com.ads.admob.toLoadAdError
@@ -68,6 +69,7 @@ class MaxBannerFactoryImpl : MaxBannerFactory {
                 adjustAdRevenue.setAdRevenuePlacement(ad.placement)
 
                 Adjust.trackAdRevenue(adjustAdRevenue)
+                FirebaseAnalyticsHelper.logEventWithAds(context, ad)
             }
             adView.loadAd()
         } catch (ex: Exception) {

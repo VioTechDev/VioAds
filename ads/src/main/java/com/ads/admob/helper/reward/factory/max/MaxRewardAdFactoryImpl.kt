@@ -7,6 +7,7 @@ import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
 import com.ads.admob.data.ContentAd
+import com.ads.admob.event.FirebaseAnalyticsHelper
 import com.ads.admob.listener.RewardAdCallBack
 import com.ads.admob.listener.RewardInterAdCallBack
 import com.ads.admob.toAdError
@@ -60,7 +61,7 @@ class MaxRewardAdFactoryImpl : MaxRewardAdFactory {
             adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
             adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
             adjustAdRevenue.setAdRevenuePlacement(ad.placement)
-
+            FirebaseAnalyticsHelper.logEventWithAds(context, ad)
             Adjust.trackAdRevenue(adjustAdRevenue)
         }
         rewardedAd.loadAd()

@@ -8,6 +8,7 @@ import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
 import com.ads.admob.data.ContentAd
+import com.ads.admob.event.FirebaseAnalyticsHelper
 import com.ads.admob.listener.NativeAdCallback
 import com.ads.admob.toLoadAdError
 import com.ads.control.R
@@ -35,6 +36,7 @@ class MaxNativeFactoryImpl : MaxNativeFactory {
             adjustAdRevenue.setAdRevenuePlacement(ad.placement)
 
             Adjust.trackAdRevenue(adjustAdRevenue)
+            FirebaseAnalyticsHelper.logEventWithAds(context, ad)
         }
         nativeAdLoader.setNativeAdListener(object : MaxNativeAdListener() {
             override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {
