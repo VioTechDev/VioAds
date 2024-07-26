@@ -55,7 +55,9 @@ class AppResumeAdHelper(
 
     private var oldActivity: Activity? = null
     private var isFistResumeApp = true
-
+    fun requestAppOpenResume() {
+        appOpenAdManager.loadAd(application)
+    }
     init {
         lifecycleOwner.lifecycle.addObserver(this)
         appOpenAdManager = AppOpenAdManager(config.networkProvider)
