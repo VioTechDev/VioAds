@@ -36,7 +36,7 @@ class InterstitialAdSplashHelper(
         CopyOnWriteArrayList()
     private val adInterstitialState: MutableStateFlow<AdInterstitialState> =
         MutableStateFlow(if (canRequestAds()) AdInterstitialState.None else AdInterstitialState.Fail)
-    var interstitialAdValue: InterstitialAd? = null
+    var interstitialAdValue: ContentAd? = null
         private set
 
     private var requestTimeOutJob: Job? = null
@@ -80,7 +80,7 @@ class InterstitialAdSplashHelper(
                     AdmobManager.adsShowFullScreen()
                     showDialogLoading()
                     delay(800)
-                    AdmobFactory.getInstance()
+                    AdmobFactory.INSTANCE
                         .showInterstitial(activity, interstitialAdValue, invokeListenerAdCallback())
                     loadingJob = lifecycleOwner.lifecycleScope.launch {
                         delay(2000)
@@ -98,7 +98,7 @@ class InterstitialAdSplashHelper(
 
     private fun createInterAds(activity: Activity) {
         requestTimeOutJob = lifecycleOwner.lifecycleScope.launch {
-            AdmobFactory.getInstance()
+            AdmobFactory.INSTANCE
                 .requestInterstitialAds(activity, config.idAds, invokeListenerAdCallback())
             delay(config.timeOut)
             if (interstitialAdValue != null && config.showReady) {
@@ -161,8 +161,8 @@ class InterstitialAdSplashHelper(
                 requestTimeOutJob?.cancel()
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApInterstitialAd) {
-                interstitialAdValue = data.interstitialAd
+            override fun onAdLoaded(data: ContentAd) {
+                interstitialAdValue = data
                 lifecycleOwner.lifecycleScope.launch {
                     adInterstitialState.emit(AdInterstitialState.Loaded)
                 }

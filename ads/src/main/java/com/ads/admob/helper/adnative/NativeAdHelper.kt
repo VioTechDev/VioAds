@@ -45,7 +45,7 @@ class NativeAdHelper(
     private var isRequestValid = true
     var adVisibility: AdOptionVisibility = AdOptionVisibility.GONE
 
-    var nativeAd: NativeAd? = null
+    var nativeAd: ContentAd? = null
         private set
 
     init {
@@ -119,7 +119,7 @@ class NativeAdHelper(
         when (adsParam) {
             is AdNativeState.Loaded -> {
                 if (nativeContentView != null && shimmerLayoutView != null) {
-                    AdmobFactory.getInstance().populateNativeAdView(
+                    AdmobFactory.INSTANCE.populateNativeAdView(
                         activity,
                         adsParam.adNative,
                         config.getLayoutIdByMediationNativeAd(adsParam.adNative),
@@ -146,7 +146,7 @@ class NativeAdHelper(
 
     private fun createNativeAds(activity: Activity) {
         if (canRequestAds()) {
-            AdmobFactory.getInstance()
+            AdmobFactory.INSTANCE
                 .requestNativeAd(context = activity, config.idAds, invokeListenerAdCallback())
         }
     }
@@ -157,11 +157,11 @@ class NativeAdHelper(
             override fun populateNativeAd() {
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 if (isActiveState()) {
-                    this@NativeAdHelper.nativeAd = data.nativeAd
+                    this@NativeAdHelper.nativeAd = data
                     lifecycleOwner.lifecycleScope.launch {
-                        adNativeState.emit(AdNativeState.Loaded(data.nativeAd))
+                        adNativeState.emit(AdNativeState.Loaded(data))
                     }
                     logZ("onNativeAdLoaded")
                 } else {
@@ -255,7 +255,7 @@ class NativeAdHelper(
                 invokeAdListener { it.populateNativeAd() }
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 invokeAdListener {
                     it.onAdLoaded(data)
                 }

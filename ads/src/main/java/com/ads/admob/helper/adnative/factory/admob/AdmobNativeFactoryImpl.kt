@@ -1,4 +1,4 @@
-package com.ads.admob.helper.adnative.factory
+package com.ads.admob.helper.adnative.factory.admob
 
 import android.content.Context
 import android.view.LayoutInflater

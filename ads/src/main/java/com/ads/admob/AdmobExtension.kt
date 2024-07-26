@@ -6,9 +6,14 @@ import android.util.DisplayMetrics
 import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
+import com.ads.admob.config.NetworkProvider
+import com.applovin.mediation.MaxError
 import com.google.ads.mediation.admob.AdMobAdapter
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.LoadAdError
+
 /**
  * Created by ViO on 16/03/2024.
  */
@@ -83,5 +88,18 @@ annotation class RewardType {
     companion object {
         const val NORMAL = 0
         const val INTERSTITIAL = 1
+    }
+}
+
+fun MaxError.toLoadAdError() = run { LoadAdError(this.code, this.message, "", null, null) }
+fun MaxError.toAdError() = run { AdError(this.code, this.message, "") }
+
+fun String.idToNetworkProvider() : Int = run {
+    val admobPattern = Regex("""^ca-app-pub-\d{16}/\d{10}$""")
+    val applovinPattern = Regex("""^[a-zA-Z0-9]{16}$""")
+    when {
+        admobPattern.matches(this) -> NetworkProvider.ADMOB
+        applovinPattern.matches(this) -> NetworkProvider.MAX
+        else -> 0
     }
 }

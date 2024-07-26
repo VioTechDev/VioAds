@@ -3,6 +3,7 @@ package com.ads.admob.helper.banner
 import android.app.Activity
 import android.graphics.Color
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -19,7 +20,6 @@ import com.ads.admob.listener.BannerAdCallBack
 import com.ads.control.R
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +49,7 @@ class BannerAdHelper(
     private var bannerContentView: FrameLayout? = null
     private var isRequestValid = true
 
-    var bannerAdView: AdView? = null
+    var bannerAdView: ContentAd? = null
         private set
 
     init {
@@ -87,10 +87,8 @@ class BannerAdHelper(
             }
         }.launchIn(lifecycleOwner.lifecycleScope)
         //for action resume or init
-        adBannerState
-            .onEach { logZ("adBannerState(${it::class.java.simpleName})") }
-            .launchIn(lifecycleOwner.lifecycleScope)
         adBannerState.onEach { adsParam ->
+            logZ("dsadsadr24")
             handleShowAds(adsParam)
         }.launchIn(lifecycleOwner.lifecycleScope)
     }
@@ -112,10 +110,28 @@ class BannerAdHelper(
                     val oldHeight = bannerContentView.height
                     bannerContentView.let {
                         it.removeAllViews()
-                        if (!config.useInlineAdaptive && config.bannerInlineStyle == BannerInlineStyle.SMALL_STYLE) {
-                            it.addView(view, 0, oldHeight)
+                        when(adsParam.adBanner){
+                            is ContentAd.AdmobAd.ApBannerAd -> {
+                                if (!config.useInlineAdaptive && config.bannerInlineStyle == BannerInlineStyle.SMALL_STYLE) {
+                                    it.addView(view, 0, oldHeight)
+                                }
+                                it.addView(adsParam.adBanner.adView)
+                            }
+                            is ContentAd.MaxContentAd.ApBannerAd -> {
+                                val width = ViewGroup.LayoutParams.MATCH_PARENT
+                                // Banner height on phones and tablets is 50 and 90, respectively
+                                val heightPx: Int = activity.resources
+                                    .getDimensionPixelSize(R.dimen.banner_height)
+                                adsParam.adBanner.adView.layoutParams =
+                                    FrameLayout.LayoutParams(width, heightPx)
+                                it.addView(adsParam.adBanner.adView)
+                            }
+                             else -> {
+                                 invokeAdListener {
+                                     it.onAdFailedToShow(AdError(1999, "Ad not support", ""))
+                                 }
+                             }
                         }
-                        it.addView(adsParam.adBanner)
                     }
                 }
             }
@@ -169,7 +185,7 @@ class BannerAdHelper(
 
     private fun loadBannerAd() {
         if (canRequestAds()) {
-            AdmobFactory.getInstance()
+            AdmobFactory.INSTANCE
                 .requestBannerAd(
                     activity,
                     config.idAds,
@@ -208,11 +224,11 @@ class BannerAdHelper(
 
     private fun getDefaultCallback(): BannerAdCallBack {
         return object : BannerAdCallBack {
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApBannerAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 if (isActiveState()) {
                     lifecycleOwner.lifecycleScope.launch {
-                        bannerAdView = data.adView
-                        adBannerState.emit(AdBannerState.Loaded(data.adView))
+                        bannerAdView = data
+                        adBannerState.emit(AdBannerState.Loaded(data))
                     }
                     logZ("onBannerLoaded()")
                 } else {
@@ -261,7 +277,7 @@ class BannerAdHelper(
 
     private fun invokeListenerAdCallback(): BannerAdCallBack {
         return object : BannerAdCallBack {
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApBannerAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 invokeAdListener { it.onAdLoaded(data) }
                 logZ("onAdLoaded")
             }

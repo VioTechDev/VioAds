@@ -2,6 +2,7 @@ package com.ads.admob.helper.adnative
 
 import android.util.Log
 import androidx.annotation.LayoutRes
+import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.IAdsConfig
 import com.ads.admob.helper.adnative.params.AdNativeMediation
 import com.ads.admob.helper.adnative.params.NativeLayoutMediation
@@ -51,16 +52,20 @@ class NativeAdConfig(
      * @return The layout ID associated with the current mediation type or the default layout ID.
      */
     @LayoutRes
-    fun getLayoutIdByMediationNativeAd(nativeAd: NativeAd?): Int {
-        val listLayout = listLayoutByMediation
+    fun getLayoutIdByMediationNativeAd(nativeAd: ContentAd?): Int {
+        if (nativeAd is ContentAd.AdmobAd.ApNativeAd){
+            val listLayout = listLayoutByMediation
 
-        return if (listLayout.isEmpty() || nativeAd == null) {
-            layoutId
+            return if (listLayout.isEmpty()) {
+                layoutId
+            } else {
+                val currentMediation = AdNativeMediation.get(nativeAd.nativeAd)
+                listLayout.find { currentMediation == it.mediationType }?.also {
+                    Log.d("NativeAdHelper", "show with mediation ${it.mediationType.name}")
+                }?.layoutId ?: layoutId
+            }
         } else {
-            val currentMediation = AdNativeMediation.get(nativeAd)
-            listLayout.find { currentMediation == it.mediationType }?.also {
-                Log.d("NativeAdHelper", "show with mediation ${it.mediationType.name}")
-            }?.layoutId ?: layoutId
+          return  layoutId
         }
     }
 }

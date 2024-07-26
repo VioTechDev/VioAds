@@ -13,17 +13,25 @@ import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
 import com.adjust.sdk.LogLevel
+import com.ads.admob.config.NetworkProvider
 import com.ads.admob.config.VioAdConfig
 import com.ads.admob.config.VioAdjustConfig
 import com.ads.admob.data.ContentAd
-import com.ads.admob.helper.adnative.factory.AdmobNativeFactory
-import com.ads.admob.helper.banner.factory.AdmobBannerFactory
-import com.ads.admob.helper.interstitial.factory.AdmobInterstitialAdFactory
-import com.ads.admob.helper.reward.factory.AdmobRewardAdFactory
+import com.ads.admob.helper.adnative.factory.admob.AdmobNativeFactory
+import com.ads.admob.helper.adnative.factory.max.MaxNativeFactory
+import com.ads.admob.helper.banner.factory.admob.AdmobBannerFactory
+import com.ads.admob.helper.banner.factory.max.MaxBannerFactory
+import com.ads.admob.helper.interstitial.factory.admob.AdmobInterstitialAdFactory
+import com.ads.admob.helper.interstitial.factory.max.MaxInterstitialAdFactory
+import com.ads.admob.helper.reward.factory.admob.AdmobRewardAdFactory
+import com.ads.admob.helper.reward.factory.max.MaxRewardAdFactory
+import com.ads.admob.idToNetworkProvider
 import com.ads.admob.listener.BannerAdCallBack
 import com.ads.admob.listener.InterstitialAdCallback
 import com.ads.admob.listener.NativeAdCallback
 import com.ads.admob.listener.RewardAdCallBack
+import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkConfiguration
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdapterResponseInfo
@@ -31,10 +39,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.initialization.InitializationStatus
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewarded.RewardedAd
 
 /**
  * Created by ViO on 16/03/2024.
@@ -46,6 +51,7 @@ class AdmobFactoryImpl : AdmobFactory {
         context: Application,
         adConfig: VioAdConfig
     ) {
+
         this.vioAdConfig = adConfig
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val processName = Application.getProcessName()
@@ -54,22 +60,58 @@ class AdmobFactoryImpl : AdmobFactory {
                 WebView.setDataDirectorySuffix(processName)
             }
         }
-        setupAdjust(context, adConfig.vioAdjustConfig)
-        MobileAds.initialize(context) { initializationStatus: InitializationStatus ->
-            val statusMap = initializationStatus.adapterStatusMap
-            for (adapterClass in statusMap.keys) {
-                val status = statusMap[adapterClass]
-                Log.d(
-                    TAG, String.format(
-                        "Adapter name: %s, Description: %s, Latency: %d",
-                        adapterClass, status!!.description, status.latency
-                    )
+        when(vioAdConfig.provider){
+            NetworkProvider.ADMOB -> {
+                MobileAds.initialize(context) { initializationStatus: InitializationStatus ->
+                    val statusMap = initializationStatus.adapterStatusMap
+                    for (adapterClass in statusMap.keys) {
+                        val status = statusMap[adapterClass]
+                        Log.d(
+                            TAG, String.format(
+                                "Adapter name: %s, Description: %s, Latency: %d",
+                                adapterClass, status!!.description, status.latency
+                            )
+                        )
+                    }
+                }
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder().setTestDeviceIds(adConfig.listDevices).build()
                 )
             }
+            NetworkProvider.MAX -> {
+                AppLovinSdk.getInstance(context).settings.testDeviceAdvertisingIds = arrayListOf("ffd0b4a3-9a3e-4745-89d1-43ce7b321bfe")
+
+                AppLovinSdk.getInstance(context).mediationProvider = "max"
+                AppLovinSdk.initializeSdk(context) { configuration: AppLovinSdkConfiguration? ->
+                    // AppLovin SDK is initialized, start loading ads
+                }
+            }
+            NetworkProvider.MIX -> {
+                MobileAds.initialize(context) { initializationStatus: InitializationStatus ->
+                    val statusMap = initializationStatus.adapterStatusMap
+                    for (adapterClass in statusMap.keys) {
+                        val status = statusMap[adapterClass]
+                        Log.d(
+                            TAG, String.format(
+                                "Adapter name: %s, Description: %s, Latency: %d",
+                                adapterClass, status!!.description, status.latency
+                            )
+                        )
+                    }
+                }
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder().setTestDeviceIds(adConfig.listDevices).build()
+                )
+                AppLovinSdk.getInstance(context).settings.testDeviceAdvertisingIds = arrayListOf("ffd0b4a3-9a3e-4745-89d1-43ce7b321bfe")
+
+                AppLovinSdk.getInstance(context).mediationProvider = "max"
+                AppLovinSdk.initializeSdk(context) { configuration: AppLovinSdkConfiguration? ->
+                    // AppLovin SDK is initialized, start loading ads
+                }
+            }
+
         }
-        MobileAds.setRequestConfiguration(
-            RequestConfiguration.Builder().setTestDeviceIds(adConfig.listDevices).build()
-        )
+        setupAdjust(context, adConfig.vioAdjustConfig)
     }
 
     private fun setupAdjust(application: Application, adjustConfig: VioAdjustConfig) {
@@ -78,8 +120,6 @@ class AdmobFactoryImpl : AdmobFactory {
         } else {
             AdjustConfig.ENVIRONMENT_SANDBOX
         }
-        Log.i("Application", "setupAdjust: ${environment}")
-
         val config = AdjustConfig(application, adjustConfig.adjustToken, environment)
 
         // Change the log level.
@@ -133,7 +173,6 @@ class AdmobFactoryImpl : AdmobFactory {
         application.registerActivityLifecycleCallbacks(AdjustLifecycleCallbacks())
         config.setSendInBackground(true)
         Adjust.onCreate(config)
-        Log.e(TAG, "setupAdjustSuccess:  ${config.isValid}", )
     }
 
     private class AdjustLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
@@ -170,25 +209,114 @@ class AdmobFactoryImpl : AdmobFactory {
         useInlineAdaptive: Boolean,
         adCallback: BannerAdCallBack
     ) {
-        AdmobBannerFactory.getInstance()
-            .requestBannerAd(
-                context,
-                adId,
-                collapsibleGravity,
-                bannerInlineStyle,
-                useInlineAdaptive,
-                object : BannerAdCallBack{
-                    override fun onAdLoaded(data: ContentAd.AdmobAd.ApBannerAd) {
-                        adCallback.onAdLoaded(data)
-                        data.adView.setOnPaidEventListener {adValue ->
-                            val loadedAdapterResponseInfo: AdapterResponseInfo? = data.adView.responseInfo?.loadedAdapterResponseInfo
-                            val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-                            adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
-                            adRevenue.setAdRevenuePlacement("Banner")
-                            if (loadedAdapterResponseInfo != null) {
-                                adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+        when (adId.idToNetworkProvider()) {
+            NetworkProvider.ADMOB -> {
+                AdmobBannerFactory.getInstance()
+                    .requestBannerAd(
+                        context,
+                        adId,
+                        collapsibleGravity,
+                        bannerInlineStyle,
+                        useInlineAdaptive,
+                        object : BannerAdCallBack {
+                            override fun onAdLoaded(data: ContentAd) {
+                                adCallback.onAdLoaded(data)
+                                if (data is ContentAd.AdmobAd.ApBannerAd) {
+                                    data.adView.setOnPaidEventListener { adValue ->
+                                        val loadedAdapterResponseInfo: AdapterResponseInfo? =
+                                            data.adView.responseInfo?.loadedAdapterResponseInfo
+                                        val adRevenue =
+                                            AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+                                        adRevenue.setRevenue(
+                                            adValue.valueMicros / 1000000.0,
+                                            adValue.currencyCode
+                                        )
+                                        adRevenue.setAdRevenuePlacement("Banner")
+                                        if (loadedAdapterResponseInfo != null) {
+                                            adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+                                        }
+                                        Adjust.trackAdRevenue(adRevenue)
+                                    }
+                                }
                             }
-                            Adjust.trackAdRevenue(adRevenue)
+
+                            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                                adCallback.onAdFailedToLoad(loadAdError)
+                            }
+
+                            override fun onAdClicked() {
+                                adCallback.onAdClicked()
+                            }
+
+                            override fun onAdImpression() {
+                                adCallback.onAdImpression()
+                            }
+
+                            override fun onAdFailedToShow(adError: AdError) {
+                                adCallback.onAdFailedToShow(adError)
+                            }
+
+                        }
+                    )
+            }
+
+            NetworkProvider.MAX -> {
+                MaxBannerFactory.getInstance()
+                    .requestBannerAd(
+                        context,
+                        adId,
+                        object : BannerAdCallBack {
+                            override fun onAdLoaded(data: ContentAd) {
+                                adCallback.onAdLoaded(data)
+                            }
+
+                            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                                adCallback.onAdFailedToLoad(loadAdError)
+                            }
+
+                            override fun onAdClicked() {
+                                adCallback.onAdClicked()
+                            }
+
+                            override fun onAdImpression() {
+                                adCallback.onAdImpression()
+                            }
+
+                            override fun onAdFailedToShow(adError: AdError) {
+                                adCallback.onAdFailedToShow(adError)
+                            }
+                        }
+                    )
+            }
+        }
+
+    }
+
+    override fun requestNativeAd(
+        context: Context,
+        adId: String,
+        adCallback: NativeAdCallback
+    ) {
+        when (adId.idToNetworkProvider()) {
+            NetworkProvider.ADMOB -> {
+                AdmobNativeFactory.getInstance().requestNativeAd(context, adId, object : NativeAdCallback{
+                    override fun populateNativeAd() {
+                        adCallback.populateNativeAd()
+                    }
+
+                    override fun onAdLoaded(data: ContentAd) {
+                        adCallback.onAdLoaded(data)
+                        if (data is ContentAd.AdmobAd.ApNativeAd){
+                            data.nativeAd.setOnPaidEventListener {adValue ->
+                                val loadedAdapterResponseInfo: AdapterResponseInfo? = data.nativeAd.responseInfo?.loadedAdapterResponseInfo
+                                val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+                                adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
+                                adRevenue.setAdRevenuePlacement("Native")
+                                if (loadedAdapterResponseInfo != null) {
+                                    adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+                                }
+                                Adjust.trackAdRevenue(adRevenue)
+                            }
                         }
                     }
 
@@ -197,80 +325,84 @@ class AdmobFactoryImpl : AdmobFactory {
                     }
 
                     override fun onAdClicked() {
-                       adCallback.onAdClicked()
+                        adCallback.onAdClicked()
                     }
 
                     override fun onAdImpression() {
-                       adCallback.onAdImpression()
+                        adCallback.onAdImpression()
                     }
 
                     override fun onAdFailedToShow(adError: AdError) {
-                       adCallback.onAdFailedToShow(adError)
+                        adCallback.onAdFailedToShow(adError)
                     }
 
-                }
-            )
-    }
-
-    override fun requestNativeAd(
-        context: Context,
-        adId: String,
-        adCallback: NativeAdCallback
-    ) {
-        AdmobNativeFactory.getInstance().requestNativeAd(context, adId, object : NativeAdCallback{
-            override fun populateNativeAd() {
-                adCallback.populateNativeAd()
+                })
             }
-
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
-               adCallback.onAdLoaded(data)
-                data.nativeAd.setOnPaidEventListener {adValue ->
-                    val loadedAdapterResponseInfo: AdapterResponseInfo? = data.nativeAd.responseInfo?.loadedAdapterResponseInfo
-                    val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-                    adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
-                    adRevenue.setAdRevenuePlacement("Native")
-                    if (loadedAdapterResponseInfo != null) {
-                        adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+            NetworkProvider.MAX -> {
+                MaxNativeFactory.getInstance().requestNativeAd(context, adId, object : NativeAdCallback{
+                    override fun populateNativeAd() {
+                        adCallback.populateNativeAd()
                     }
-                    Adjust.trackAdRevenue(adRevenue)
-                }
-            }
 
-            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                adCallback.onAdFailedToLoad(loadAdError)
-            }
+                    override fun onAdLoaded(data: ContentAd) {
+                        adCallback.onAdLoaded(data)
+                    }
 
-            override fun onAdClicked() {
-               adCallback.onAdClicked()
-            }
+                    override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                        adCallback.onAdFailedToLoad(loadAdError)
+                    }
 
-            override fun onAdImpression() {
-                adCallback.onAdImpression()
-            }
+                    override fun onAdClicked() {
+                        adCallback.onAdClicked()
+                    }
 
-            override fun onAdFailedToShow(adError: AdError) {
-               adCallback.onAdFailedToShow(adError)
-            }
+                    override fun onAdImpression() {
+                        adCallback.onAdImpression()
+                    }
 
-        })
+                    override fun onAdFailedToShow(adError: AdError) {
+                        adCallback.onAdFailedToShow(adError)
+                    }
+
+                })
+            }
+        }
     }
 
     override fun populateNativeAdView(
         context: Context,
-        nativeAd: NativeAd,
+        nativeAd: ContentAd,
         nativeAdViewId: Int,
         adPlaceHolder: FrameLayout,
         containerShimmerLoading: ShimmerFrameLayout?,
         adCallback: NativeAdCallback
     ) {
-        AdmobNativeFactory.getInstance().populateNativeAdView(
-            context,
-            nativeAd,
-            nativeAdViewId,
-            adPlaceHolder,
-            containerShimmerLoading,
-            adCallback
-        )
+        when (nativeAd){
+            is ContentAd.AdmobAd.ApNativeAd -> {
+                AdmobNativeFactory.getInstance().populateNativeAdView(
+                    context,
+                    nativeAd.nativeAd,
+                    nativeAdViewId,
+                    adPlaceHolder,
+                    containerShimmerLoading,
+                    adCallback
+                )
+            }
+            is ContentAd.MaxContentAd.ApNativeAd -> {
+                MaxNativeFactory.getInstance().populateNativeAdView(
+                    context,
+                    nativeAd,
+                    nativeAdViewId,
+                    adPlaceHolder,
+                    containerShimmerLoading,
+                    adCallback
+                )
+            }
+            else -> {
+                adCallback.onAdFailedToShow(AdError(1999, "Ad Not support", ""))
+            }
+        }
+
     }
 
     override fun requestInterstitialAds(
@@ -278,113 +410,240 @@ class AdmobFactoryImpl : AdmobFactory {
         adId: String,
         adCallback: InterstitialAdCallback
     ) {
-        AdmobInterstitialAdFactory.getInstance().requestInterstitialAd(context, adId, object : InterstitialAdCallback{
-            override fun onNextAction() {
-                adCallback.onNextAction()
+        when (adId.idToNetworkProvider()) {
+            NetworkProvider.ADMOB -> {
+                AdmobInterstitialAdFactory.getInstance()
+                    .requestInterstitialAd(context, adId, object : InterstitialAdCallback {
+                        override fun onNextAction() {
+                            adCallback.onNextAction()
+                        }
+
+                        override fun onAdClose() {
+                            adCallback.onAdClose()
+                        }
+
+                        override fun onInterstitialShow() {
+                            adCallback.onInterstitialShow()
+                        }
+
+                        override fun onAdLoaded(data: ContentAd) {
+                            if (data is ContentAd.AdmobAd.ApInterstitialAd) {
+                                adCallback.onAdLoaded(data)
+                                data.interstitialAd.setOnPaidEventListener { adValue ->
+                                    val loadedAdapterResponseInfo: AdapterResponseInfo? =
+                                        data.interstitialAd.responseInfo.loadedAdapterResponseInfo
+                                    val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+                                    adRevenue.setRevenue(
+                                        adValue.valueMicros / 1000000.0,
+                                        adValue.currencyCode
+                                    )
+                                    adRevenue.setAdRevenuePlacement("Interstitial")
+                                    if (loadedAdapterResponseInfo != null) {
+                                        adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+                                    }
+                                    Adjust.trackAdRevenue(adRevenue)
+                                }
+                            }
+                        }
+
+                        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            adCallback.onAdFailedToLoad(loadAdError)
+                        }
+
+                        override fun onAdClicked() {
+                            adCallback.onAdClicked()
+                        }
+
+                        override fun onAdImpression() {
+                            adCallback.onAdImpression()
+                        }
+
+                        override fun onAdFailedToShow(adError: AdError) {
+                            adCallback.onAdFailedToShow(adError)
+                        }
+
+                    })
             }
 
-            override fun onAdClose() {
-                adCallback.onAdClose()
-            }
+            NetworkProvider.MAX -> {
+                MaxInterstitialAdFactory.getInstance()
+                    .requestInterstitialAd(context, adId, object : InterstitialAdCallback {
+                        override fun onNextAction() {
+                            adCallback.onNextAction()
+                        }
 
-            override fun onInterstitialShow() {
-                adCallback.onInterstitialShow()
-            }
+                        override fun onAdClose() {
+                            adCallback.onAdClose()
+                        }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApInterstitialAd) {
-               adCallback.onAdLoaded(data)
-                data.interstitialAd.setOnPaidEventListener {adValue ->
-                    val loadedAdapterResponseInfo: AdapterResponseInfo? = data.interstitialAd.responseInfo.loadedAdapterResponseInfo
-                    val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-                    adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
-                    adRevenue.setAdRevenuePlacement("Interstitial")
-                    if (loadedAdapterResponseInfo != null) {
-                        adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
-                    }
-                    Adjust.trackAdRevenue(adRevenue)
-                }
-            }
+                        override fun onInterstitialShow() {
+                            adCallback.onInterstitialShow()
+                        }
 
-            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-               adCallback.onAdFailedToLoad(loadAdError)
-            }
+                        override fun onAdLoaded(data: ContentAd) {
+                            adCallback.onAdLoaded(data)
+                        }
 
-            override fun onAdClicked() {
-               adCallback.onAdClicked()
-            }
+                        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            adCallback.onAdFailedToLoad(loadAdError)
+                        }
 
-            override fun onAdImpression() {
-               adCallback.onAdImpression()
-            }
+                        override fun onAdClicked() {
+                            adCallback.onAdClicked()
+                        }
 
-            override fun onAdFailedToShow(adError: AdError) {
-               adCallback.onAdFailedToShow(adError)
-            }
+                        override fun onAdImpression() {
+                            adCallback.onAdImpression()
+                        }
 
-        })
+                        override fun onAdFailedToShow(adError: AdError) {
+                            adCallback.onAdFailedToShow(adError)
+                        }
+
+                    })
+            }
+        }
     }
 
     override fun showInterstitial(
         context: Context,
-        interstitialAd: InterstitialAd?,
+        interstitialAd: ContentAd?,
         adCallback: InterstitialAdCallback
     ) {
-        AdmobInterstitialAdFactory.getInstance()
-            .showInterstitial(context, interstitialAd, adCallback)
+        when (interstitialAd) {
+            is ContentAd.AdmobAd.ApInterstitialAd -> {
+                AdmobInterstitialAdFactory.getInstance()
+                    .showInterstitial(context, interstitialAd.interstitialAd, adCallback)
+            }
+
+            is ContentAd.MaxContentAd.ApInterstitialAd -> {
+                MaxInterstitialAdFactory.getInstance()
+                    .showInterstitial(context, interstitialAd.interstitialAd, adCallback)
+            }
+
+            else -> {
+                adCallback.onAdFailedToShow(AdError(1999, "Ad Not support", ""))
+            }
+        }
+
     }
 
     override fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack) {
-        AdmobRewardAdFactory.getInstance().requestRewardAd(context, adId, object : RewardAdCallBack{
-            override fun onAdClose() {
-                adCallback.onAdClose()
+        when (adId.idToNetworkProvider()) {
+            NetworkProvider.ADMOB -> {
+                AdmobRewardAdFactory.getInstance()
+                    .requestRewardAd(context, adId, object : RewardAdCallBack {
+                        override fun onAdClose() {
+                            adCallback.onAdClose()
+                        }
+
+                        override fun onUserEarnedReward(rewardItem: RewardItem?) {
+                            adCallback.onUserEarnedReward(rewardItem)
+                        }
+
+                        override fun onRewardShow() {
+                            adCallback.onRewardShow()
+                        }
+
+                        override fun onAdLoaded(data: ContentAd) {
+                            adCallback.onAdLoaded(data)
+                            if (data is ContentAd.AdmobAd.ApRewardAd) {
+                                data.rewardAd.setOnPaidEventListener { adValue ->
+                                    val loadedAdapterResponseInfo: AdapterResponseInfo? =
+                                        data.rewardAd.responseInfo.loadedAdapterResponseInfo
+                                    val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
+                                    adRevenue.setRevenue(
+                                        adValue.valueMicros / 1000000.0,
+                                        adValue.currencyCode
+                                    )
+                                    adRevenue.setAdRevenuePlacement("RewardAd")
+                                    if (loadedAdapterResponseInfo != null) {
+                                        adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
+                                    }
+                                    Adjust.trackAdRevenue(adRevenue)
+                                }
+                            }
+                        }
+
+                        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            adCallback.onAdFailedToLoad(loadAdError)
+                        }
+
+                        override fun onAdClicked() {
+                            adCallback.onAdClicked()
+                        }
+
+                        override fun onAdImpression() {
+                            adCallback.onAdImpression()
+                        }
+
+                        override fun onAdFailedToShow(adError: AdError) {
+                            adCallback.onAdFailedToShow(adError)
+                        }
+                    })
             }
 
-            override fun onUserEarnedReward(rewardItem: RewardItem?) {
-                adCallback.onUserEarnedReward(rewardItem)
-            }
+            NetworkProvider.MAX -> {
+                MaxRewardAdFactory.getInstance()
+                    .requestRewardAd(context, adId, object : RewardAdCallBack {
+                        override fun onAdClose() {
+                            adCallback.onAdClose()
+                        }
 
-            override fun onRewardShow() {
-               adCallback.onRewardShow()
-            }
+                        override fun onUserEarnedReward(rewardItem: RewardItem?) {
+                            adCallback.onUserEarnedReward(rewardItem)
+                        }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApRewardAd) {
-                adCallback.onAdLoaded(data)
-                data.rewardAd.setOnPaidEventListener {adValue ->
-                    val loadedAdapterResponseInfo: AdapterResponseInfo? = data.rewardAd.responseInfo.loadedAdapterResponseInfo
-                    val adRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_ADMOB)
-                    adRevenue.setRevenue(adValue.valueMicros / 1000000.0, adValue.currencyCode)
-                    adRevenue.setAdRevenuePlacement("RewardAd")
-                    if (loadedAdapterResponseInfo != null) {
-                        adRevenue.setAdRevenueNetwork(loadedAdapterResponseInfo.adSourceName)
-                    }
-                    Adjust.trackAdRevenue(adRevenue)
-                }
-            }
+                        override fun onRewardShow() {
+                            adCallback.onRewardShow()
+                        }
 
-            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-               adCallback.onAdFailedToLoad(loadAdError)
-            }
+                        override fun onAdLoaded(data: ContentAd) {
+                            adCallback.onAdLoaded(data)
+                        }
 
-            override fun onAdClicked() {
-               adCallback.onAdClicked()
-            }
+                        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            adCallback.onAdFailedToLoad(loadAdError)
+                        }
 
-            override fun onAdImpression() {
-                adCallback.onAdImpression()
-            }
+                        override fun onAdClicked() {
+                            adCallback.onAdClicked()
+                        }
 
-            override fun onAdFailedToShow(adError: AdError) {
-                adCallback.onAdFailedToShow(adError)
+                        override fun onAdImpression() {
+                            adCallback.onAdImpression()
+                        }
+
+                        override fun onAdFailedToShow(adError: AdError) {
+                            adCallback.onAdFailedToShow(adError)
+                        }
+                    })
+
             }
-        })
+        }
     }
 
     override fun showRewardAd(
         activity: Activity,
-        rewardedAd: RewardedAd,
+        rewardedAd: ContentAd,
         adCallback: RewardAdCallBack
     ) {
-        AdmobRewardAdFactory.getInstance().showRewardAd(activity, rewardedAd, adCallback)
+        when (rewardedAd) {
+            is ContentAd.AdmobAd.ApRewardAd -> {
+                AdmobRewardAdFactory.getInstance()
+                    .showRewardAd(activity, rewardedAd.rewardAd, adCallback)
+
+            }
+
+            is ContentAd.MaxContentAd.ApRewardAd -> {
+                MaxRewardAdFactory.getInstance()
+                    .showRewardAd(activity, rewardedAd.rewardAd, adCallback)
+            }
+
+            else -> {
+                adCallback.onAdFailedToShow(AdError(1999, "Ad Not support", ""))
+            }
+        }
     }
 
     companion object {

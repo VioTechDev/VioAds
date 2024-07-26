@@ -9,5 +9,6 @@ annotation class NetworkProvider {
     companion object {
         const val ADMOB = 0
         const val MAX = 1
+        const val MIX = 3
     }
 }

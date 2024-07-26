@@ -1,4 +1,4 @@
-package com.ads.admob.helper.interstitial.factory
+package com.ads.admob.helper.interstitial.factory.admob
 
 import android.content.Context
 import com.google.android.gms.ads.interstitial.InterstitialAd

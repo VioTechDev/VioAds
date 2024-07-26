@@ -1,16 +1,22 @@
 package com.example.andmoduleads
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.adjust.sdk.AdjustConfig
 import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.config.NetworkProvider
 import com.ads.admob.config.VioAdConfig
 import com.ads.admob.config.VioAdjustConfig
+import com.ads.admob.data.ContentAd
 import com.ads.admob.helper.appoppen.AppResumeAdConfig
 import com.ads.admob.helper.appoppen.AppResumeAdHelper
+import com.ads.admob.listener.AppOpenAdCallBack
+import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkConfiguration
 import com.example.andmoduleads.activity.SplashActivity
 import com.google.android.gms.ads.AdActivity
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
 
 
 class MyApplication : Application() {
@@ -26,9 +32,10 @@ class MyApplication : Application() {
         listClassInValid.add(AdActivity::class.java)
         listClassInValid.add(SplashActivity::class.java)
         val config = AppResumeAdConfig(
-            idAds = "ca-app-pub-3940256099942544/9257395921",
+            idAds = "c2026e2d6ea47670",
             listClassInValid = listClassInValid,
-            canShowAds = true
+            canShowAds = true,
+            networkProvider = NetworkProvider.MAX
         )
         return AppResumeAdHelper(
             application = this,
@@ -41,13 +48,43 @@ class MyApplication : Application() {
         super.onCreate()
         application = this
         appResumeAdHelper = initAppOpenAd()
+        appResumeAdHelper?.registerAdListener(object : AppOpenAdCallBack{
+            override fun onAppOpenAdShow() {
+                Log.e(TAG, "onAppOpenAdShow: ", )
+            }
+
+            override fun onAppOpenAdClose() {
+                Log.e(TAG, "onAppOpenAdClose: ", )
+            }
+
+            override fun onAdLoaded(data: ContentAd) {
+                Log.e(TAG, "onAdLoaded: ", )
+            }
+
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                Log.e(TAG, "onAdFailedToLoad: ", )
+            }
+
+            override fun onAdClicked() {
+                Log.e(TAG, "onAdClicked: ", )
+            }
+
+            override fun onAdImpression() {
+                Log.e(TAG, "onAdImpression: ", )
+            }
+
+            override fun onAdFailedToShow(adError: AdError) {
+                Log.e(TAG, "onAdFailedToShow: ", )
+            }
+
+        })
         val vioAdjustConfig = VioAdjustConfig.Build("mpuaogf4tngg",  false).build()
         val vioAdConfig = VioAdConfig.Builder(vioAdjustConfig = vioAdjustConfig)
             .buildVariantProduce(false)
-            .mediationProvider(NetworkProvider.ADMOB)
+            .mediationProvider(NetworkProvider.MIX)
             .listTestDevices(arrayListOf("FBDA72C75E0671544A38367B5AACCEC7"))
             .build()
-        AdmobFactory.getInstance().initAdmob(this, vioAdConfig)
+        AdmobFactory.INSTANCE.initAdmob(this, vioAdConfig)
     }
     companion object {
         var application: MyApplication? = null

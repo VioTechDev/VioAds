@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ads.admob.admob.AdmobFactory
 import com.ads.admob.data.ContentAd
-import com.ads.admob.helper.adnative.factory.AdmobNativeFactory
 import com.ads.admob.listener.NativeAdCallback
 import com.ads.admob.widget.RecyclerViewAdapterWrapper
 import com.ads.control.R
@@ -76,7 +76,7 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
     private fun onBindAdViewHolder(holder: RecyclerView.ViewHolder) {
         val adHolder = holder as AdViewHolder
         if (nativeAdapterConfig.forceReloadAdOnBind || !adHolder.loaded) {
-            AdmobNativeFactory.getInstance().requestNativeAd(
+            AdmobFactory.INSTANCE.requestNativeAd(
                 holder.itemView.context,
                 nativeAdapterConfig.nativeAdId,
                 object : NativeAdCallback {
@@ -84,10 +84,10 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
 
                     }
 
-                    override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
-                        AdmobNativeFactory.getInstance().populateNativeAdView(
+                    override fun onAdLoaded(data: ContentAd) {
+                        AdmobFactory.INSTANCE.populateNativeAdView(
                             holder.itemView.context,
-                            data.nativeAd,
+                            data,
                             nativeAdapterConfig.nativeContentView,
                             holder.nativeContentView,
                             holder.shimmerLayoutView,
@@ -96,7 +96,7 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
 
                                 }
 
-                                override fun onAdLoaded(data: ContentAd.AdmobAd.ApNativeAd) {
+                                override fun onAdLoaded(data: ContentAd) {
                                 }
 
                                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
@@ -111,7 +111,8 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
                                 override fun onAdFailedToShow(adError: AdError) {
                                 }
 
-                            })
+                            }
+                        )
                     }
 
                     override fun onAdFailedToLoad(loadAdError: LoadAdError) {

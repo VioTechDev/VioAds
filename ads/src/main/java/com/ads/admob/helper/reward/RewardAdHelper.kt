@@ -15,7 +15,6 @@ import com.ads.admob.listener.RewardAdCallBack
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewarded.RewardedAd
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +33,7 @@ class RewardAdHelper(
         CopyOnWriteArrayList()
     private val adRewardState: MutableStateFlow<AdRewardState> =
         MutableStateFlow(if (canRequestAds()) AdRewardState.None else AdRewardState.Fail)
-    var rewardAdValue: RewardedAd? = null
+    var rewardAdValue: ContentAd? = null
         private set
     private var requestShowCount = 0
 
@@ -83,7 +82,7 @@ class RewardAdHelper(
                 AdmobManager.adsShowFullScreen()
                 showDialogLoading()
                 delay(800)
-                AdmobFactory.getInstance()
+                AdmobFactory.INSTANCE
                     .showRewardAd(activity, rewardAdValue!!, invokeRewardAdCallback())
                 loadingJob = lifecycleOwner.lifecycleScope.launch {
                     delay(2000)
@@ -129,7 +128,7 @@ class RewardAdHelper(
             lifecycleOwner.lifecycleScope.launch {
                 adRewardState.emit(AdRewardState.Loading)
                logZ("createRewardAds")
-                AdmobFactory.getInstance()
+                AdmobFactory.INSTANCE
                     .requestRewardAd(
                         activity,
                         config.idAds,
@@ -169,10 +168,10 @@ class RewardAdHelper(
                 }
             }
 
-            override fun onAdLoaded(data: ContentAd.AdmobAd.ApRewardAd) {
+            override fun onAdLoaded(data: ContentAd) {
                 logZ("onRewardLoad")
                 Log.d(TAG, "onRewardLoad: ")
-                rewardAdValue = data.rewardAd
+                rewardAdValue = data
                 lifecycleOwner.lifecycleScope.launch {
                     adRewardState.emit(AdRewardState.Loaded)
                 }
