@@ -58,7 +58,7 @@ class AppOpenAdManager(private val networkManager: Int) {
         if (isLoadingAd || isAdAvailable()) {
             return
         }
-
+        Log.d(TAG, "request AOA: ")
         isLoadingAd = true
         when (adUnitId.idToNetworkProvider()) {
             NetworkProvider.ADMOB -> {
