@@ -39,7 +39,6 @@
     <string name="the_best_we_can_get">The best we can get :)</string>
     <string name="rate_us">Rate us</string>
     <string name="gmail_package">com.google.android.gm</string>
-    <string name="mail_fixback_rated">publishing.apero@gmail.com</string>
     <string name="subject_mail_fixback_rate">"[%1$s] Feedback</string>
     <string name="content_mail_fixback_rate">"i. %1$s \nii. Rate star (eg: %2$s/5) \niii. Feedback text"</string>
     <string name="rate_start_event">rate_star_%1$s</string>

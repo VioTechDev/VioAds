@@ -14,13 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndModuleAds">
-        <activity
-            android:name=".activity.SimpleListActivity"
-            android:exported="true">
-
-        </activity>
-        <activity android:name=".activity.ContentActivity" />
-        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.MainActivity"/>
         <activity android:name=".activity.SplashActivity"
             android:exported="true">
             <intent-filter>
@@ -66,10 +60,10 @@
             android:value="3N4Mt8SNhOzkQnGb9oHsRRG1ItybcZDpJWN1fVAHLdRagxP-_k_ZXVaMAdMe5Otsmp6qJSXskfsrtakfRmPAGW" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="jshdjahkjsa" />
+            android:value="745989797432510" />
 
         <meta-data android:name="com.facebook.sdk.ClientToken"
-            android:value="121yu23y3u21"/>
+            android:value="c0d5745bc3bba4876962920c678fe6f2"/>
         <meta-data
             android:name="com.facebook.sdk.AutoInitEnabled"
             android:value="true" />
