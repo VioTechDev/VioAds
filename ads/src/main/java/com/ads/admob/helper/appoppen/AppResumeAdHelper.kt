@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  */
 
 class AppResumeAdHelper(
-    application: Application,
+    private val application: Application,
     private val lifecycleOwner: LifecycleOwner,
     private val config: AppResumeAdConfig
 ) : LifecycleObserver, Application.ActivityLifecycleCallbacks {
@@ -54,6 +54,10 @@ class AppResumeAdHelper(
 
     private var oldActivity: Activity? = null
     private var isFistResumeApp = true
+
+    fun requestAppOpenResume() {
+        appOpenAdManager.loadAd(application)
+    }
 
     init {
         lifecycleOwner.lifecycle.addObserver(this)
@@ -104,7 +108,6 @@ class AppResumeAdHelper(
             }
 
         })
-        appOpenAdManager.loadAd(application)
         application.registerActivityLifecycleCallbacks(this)
     }
 

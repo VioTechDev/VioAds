@@ -25,6 +25,10 @@ class MyApplication : Application() {
     private val EVENT_PURCHASE_ADJUST = "gzel1k"
     private val EVENT_AD_IMPRESSION_ADJUST = "gzel1k"
     private val TAG = "MainApplication"
+    companion object{
+        var appResumeAdHelper: AppResumeAdHelper? = null
+            private set
+    }
 
     private fun initAppOpenAd(): AppResumeAdHelper {
         val listClassInValid = mutableListOf<Class<*>>()
@@ -46,7 +50,8 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        initAppOpenAd().registerAdListener(object : AppOpenAdCallBack{
+        appResumeAdHelper=  initAppOpenAd()
+        appResumeAdHelper?.registerAdListener(object : AppOpenAdCallBack{
             override fun onAppOpenAdShow() {
                 Log.e(TAG, "onAppOpenAdShow: ", )
             }

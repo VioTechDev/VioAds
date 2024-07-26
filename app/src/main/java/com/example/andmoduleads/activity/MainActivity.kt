@@ -1,7 +1,6 @@
 package com.example.andmoduleads.activity
 
 import android.annotation.SuppressLint
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -13,7 +12,6 @@ import com.ads.admob.helper.adnative.AdmobNativeAdAdapter
 import com.ads.admob.helper.adnative.NativeAdConfig
 import com.ads.admob.helper.adnative.NativeAdHelper
 import com.ads.admob.helper.adnative.NativeAdapterConfig
-import com.ads.admob.helper.adnative.params.NativeAdParam
 import com.ads.admob.helper.banner.BannerAdConfig
 import com.ads.admob.helper.banner.BannerAdHelper
 import com.ads.admob.helper.banner.params.BannerAdParam
@@ -26,19 +24,15 @@ import com.ads.admob.helper.reward.params.RewardAdParam
 import com.ads.admob.listener.RewardAdCallBack
 import com.example.andmoduleads.Contact
 import com.example.andmoduleads.ContactsAdapter
+import com.example.andmoduleads.MyApplication
 import com.example.andmoduleads.R
 import com.example.andmoduleads.databinding.ActivityMainBinding
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException
-import com.google.android.gms.common.GooglePlayServicesRepairableException
-import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
-    protected var isBackgroundRunning = false
     var contacts: java.util.ArrayList<Contact>? = null
     val interAdHelper by lazy { initInterAdAd() }
 
@@ -95,6 +89,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        MyApplication.appResumeAdHelper?.requestAppOpenResume()
         interAdHelper.requestAds(InterstitialAdParam.Request)
     }
     @SuppressLint("ResourceType")
