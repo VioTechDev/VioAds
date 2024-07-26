@@ -34,7 +34,7 @@ class MyApplication : Application() {
         val config = AppResumeAdConfig(
             idAds = "c2026e2d6ea47670",
             listClassInValid = listClassInValid,
-            canShowAds = false,
+            canShowAds = true,
             networkProvider = NetworkProvider.MAX
         )
         return AppResumeAdHelper(
@@ -48,7 +48,7 @@ class MyApplication : Application() {
         super.onCreate()
         application = this
         appResumeAdHelper = initAppOpenAd()
-        appResumeAdHelper.registerAdListener(object : AppOpenAdCallBack{
+        appResumeAdHelper?.registerAdListener(object : AppOpenAdCallBack{
             override fun onAppOpenAdShow() {
                 Log.e(TAG, "onAppOpenAdShow: ", )
             }

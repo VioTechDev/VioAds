@@ -55,8 +55,10 @@ class AppResumeAdHelper(
 
     private var oldActivity: Activity? = null
     private var isFistResumeApp = true
+    private var requestAppOpenResumeValid = false
     fun requestAppOpenResume() {
-        appOpenAdManager.loadAd(application)
+       requestAppOpenResumeValid = true
+        Log.e("AppOpenAdManager", "requestAppOpenResume: ", )
     }
     init {
         lifecycleOwner.lifecycle.addObserver(this)
@@ -188,7 +190,9 @@ class AppResumeAdHelper(
     }
 
     override fun onActivityPaused(p0: Activity) {
-        appOpenAdManager?.loadAd(application)
+        if (requestAppOpenResumeValid){
+            appOpenAdManager?.loadAd(application)
+        }
     }
 
     override fun onActivityStopped(activity: Activity) {

@@ -26,6 +26,7 @@ import com.ads.admob.helper.reward.params.RewardAdParam
 import com.ads.admob.listener.RewardAdCallBack
 import com.example.andmoduleads.Contact
 import com.example.andmoduleads.ContactsAdapter
+import com.example.andmoduleads.MyApplication
 import com.example.andmoduleads.R
 import com.example.andmoduleads.databinding.ActivityMainBinding
 import com.google.android.gms.ads.AdError
@@ -98,6 +99,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MyApplication.appResumeAdHelper?.requestAppOpenResume()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
         binding?.frAds?.let {
