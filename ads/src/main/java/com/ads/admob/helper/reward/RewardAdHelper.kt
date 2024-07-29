@@ -83,7 +83,7 @@ class RewardAdHelper(
                 showDialogLoading()
                 delay(800)
                 AdmobFactory.INSTANCE
-                    .showRewardAd(activity, rewardAdValue!!, invokeRewardAdCallback())
+                    .showRewardAd(activity, rewardAdValue!!, invokeRewardAdCallback(), config.adPlacement)
                 loadingJob = lifecycleOwner.lifecycleScope.launch {
                     delay(2000)
                     dialogLoading.dismiss()

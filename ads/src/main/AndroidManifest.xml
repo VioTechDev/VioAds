@@ -27,6 +27,8 @@
             android:value="true"/>
         <meta-data android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
             android:value="false" />
+        <meta-data android:name="applovin.sdk.verbose_logging" android:value="true" />
+
     </application>
     <queries>
         <package android:name="com.google.android.gm" />

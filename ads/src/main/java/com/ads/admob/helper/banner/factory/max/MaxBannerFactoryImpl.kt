@@ -73,6 +73,7 @@ class MaxBannerFactoryImpl : MaxBannerFactory {
                 Adjust.trackAdRevenue(adjustAdRevenue)
                 FirebaseAnalyticsHelper.logEventWithAds(context, ad)
             }
+            adView.placement = adPlacement ?:""
             adView.loadAd()
         } catch (ex: Exception) {
             adCallback.onAdFailedToLoad(

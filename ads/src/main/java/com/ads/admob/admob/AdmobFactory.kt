@@ -47,14 +47,16 @@ interface AdmobFactory {
     fun showInterstitial(
         context: Context,
         interstitialAd: ContentAd?,
-        adCallback: InterstitialAdCallback
+        adCallback: InterstitialAdCallback,
+        adPlacement: String? = null
     )
 
     fun requestRewardAd(context: Context, adId: String, adCallback: RewardAdCallBack, adPlacement: String? = null)
     fun showRewardAd(
         activity: Activity,
         rewardedAd: ContentAd,
-        adCallback: RewardAdCallBack
+        adCallback: RewardAdCallBack,
+        adPlacement: String? = null,
     )
     companion object {
         val INSTANCE: AdmobFactory by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { AdmobFactoryImpl() }

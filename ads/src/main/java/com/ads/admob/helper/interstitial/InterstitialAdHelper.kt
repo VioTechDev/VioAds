@@ -84,7 +84,7 @@ class InterstitialAdHelper(
                 showDialogLoading()
                 delay(800)
                 AdmobFactory.INSTANCE
-                    .showInterstitial(activity, interstitialAdValue, invokeListenerAdCallback())
+                    .showInterstitial(activity, interstitialAdValue, invokeListenerAdCallback(), config.adPlacement)
                 loadingJob = lifecycleOwner.lifecycleScope.launch {
                     delay(2000)
                     dialogLoading.dismiss()

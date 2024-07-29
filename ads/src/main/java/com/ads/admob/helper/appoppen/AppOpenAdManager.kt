@@ -299,7 +299,7 @@ class AppOpenAdManager(private val networkManager: Int) {
                         }
 
                     })
-                    (appOpenAd as ContentAd.MaxContentAd.ApAppOpenAd).appOpenAd.showAd()
+                    (appOpenAd as ContentAd.MaxContentAd.ApAppOpenAd).appOpenAd.showAd(adConfig?.adPlacement ?: "")
                 }
             }
 

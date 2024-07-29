@@ -189,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                 4,
                 true,
                 false,
-                "null"
+                "Native list"
             ).build()
         }
         val admobNativeAdAdapter = nativeAdapterConfig?.let { AdmobNativeAdAdapter(it) }

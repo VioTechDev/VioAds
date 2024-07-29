@@ -17,7 +17,8 @@ interface MaxRewardAdFactory {
     fun showRewardAd(
         activity: Activity,
         rewardedAd: MaxRewardedAd,
-        adCallback: RewardAdCallBack
+        adCallback: RewardAdCallBack,
+        adPlacement: String? = null,
     )
 
     companion object {

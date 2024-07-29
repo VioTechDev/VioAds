@@ -67,11 +67,12 @@ class MaxInterstitialAdFactoryImpl : MaxInterstitialAdFactory {
     override fun showInterstitial(
         context: Context,
         interstitialAd: MaxInterstitialAd?,
-        adCallback: InterstitialAdCallback
+        adCallback: InterstitialAdCallback,
+        adPlacement: String?
     ) {
         Log.d(TAG, "showInterstitial: ")
         interstitialAd?.let {
-            it.showAd(context as Activity)
+            it.showAd(adPlacement ?:"", context as Activity)
         }
 
         interstitialAd?.setListener(object : MaxAdListener {

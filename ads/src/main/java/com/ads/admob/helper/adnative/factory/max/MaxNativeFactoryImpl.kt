@@ -19,7 +19,6 @@ import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
 import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder
 import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.gms.ads.AdError
 
 /**
  * Created by ViO on 16/03/2024.
@@ -62,6 +61,7 @@ class MaxNativeFactoryImpl : MaxNativeFactory {
             override fun onNativeAdExpired(nativeAd: MaxAd) {
             }
         })
+        nativeAdLoader.placement = adPlacement ?: ""
         nativeAdLoader.loadAd()
     }
 

@@ -82,6 +82,7 @@ class AdmobFactoryImpl : AdmobFactory {
                 AppLovinSdk.getInstance(context).settings.testDeviceAdvertisingIds = arrayListOf("ffd0b4a3-9a3e-4745-89d1-43ce7b321bfe")
 
                 AppLovinSdk.getInstance(context).mediationProvider = "max"
+                AppLovinSdk.getInstance(context).settings.setVerboseLogging( true )
                 AppLovinSdk.initializeSdk(context) { configuration: AppLovinSdkConfiguration? ->
                     // AppLovin SDK is initialized, start loading ads
                 }
@@ -515,7 +516,8 @@ class AdmobFactoryImpl : AdmobFactory {
     override fun showInterstitial(
         context: Context,
         interstitialAd: ContentAd?,
-        adCallback: InterstitialAdCallback
+        adCallback: InterstitialAdCallback,
+        adPlacement: String?
     ) {
         when (interstitialAd) {
             is ContentAd.AdmobAd.ApInterstitialAd -> {
@@ -525,7 +527,12 @@ class AdmobFactoryImpl : AdmobFactory {
 
             is ContentAd.MaxContentAd.ApInterstitialAd -> {
                 MaxInterstitialAdFactory.getInstance()
-                    .showInterstitial(context, interstitialAd.interstitialAd, adCallback)
+                    .showInterstitial(
+                        context,
+                        interstitialAd.interstitialAd,
+                        adCallback,
+                        adPlacement
+                    )
             }
 
             else -> {
@@ -639,7 +646,8 @@ class AdmobFactoryImpl : AdmobFactory {
     override fun showRewardAd(
         activity: Activity,
         rewardedAd: ContentAd,
-        adCallback: RewardAdCallBack
+        adCallback: RewardAdCallBack,
+        adPlacement: String?
     ) {
         when (rewardedAd) {
             is ContentAd.AdmobAd.ApRewardAd -> {
@@ -650,7 +658,7 @@ class AdmobFactoryImpl : AdmobFactory {
 
             is ContentAd.MaxContentAd.ApRewardAd -> {
                 MaxRewardAdFactory.getInstance()
-                    .showRewardAd(activity, rewardedAd.rewardAd, adCallback)
+                    .showRewardAd(activity, rewardedAd.rewardAd, adCallback, adPlacement)
             }
 
             else -> {

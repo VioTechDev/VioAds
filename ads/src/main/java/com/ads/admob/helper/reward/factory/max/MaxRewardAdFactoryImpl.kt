@@ -85,7 +85,8 @@ class MaxRewardAdFactoryImpl : MaxRewardAdFactory {
     override fun showRewardAd(
         activity: Activity,
         rewardedAd: MaxRewardedAd,
-        adCallback: RewardAdCallBack
+        adCallback: RewardAdCallBack,
+        adPlacement: String?
     ) {
         rewardedAd.setListener(object : MaxRewardedAdListener {
             override fun onAdLoaded(p0: MaxAd) {
@@ -116,7 +117,7 @@ class MaxRewardAdFactoryImpl : MaxRewardAdFactory {
             }
 
         })
-        rewardedAd.showAd(activity)
+        rewardedAd.showAd(adPlacement ?: "", activity)
     }
 
 }
