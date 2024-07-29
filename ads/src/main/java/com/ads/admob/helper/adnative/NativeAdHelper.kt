@@ -147,7 +147,7 @@ class NativeAdHelper(
     private fun createNativeAds(activity: Activity) {
         if (canRequestAds()) {
             AdmobFactory.INSTANCE
-                .requestNativeAd(context = activity, config.idAds, invokeListenerAdCallback())
+                .requestNativeAd(context = activity, config.idAds, invokeListenerAdCallback(), config.adPlacement)
         }
     }
 
