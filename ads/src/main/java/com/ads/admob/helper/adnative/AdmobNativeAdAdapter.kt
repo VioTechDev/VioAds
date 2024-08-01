@@ -15,6 +15,7 @@ import com.ads.control.R
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
+import kotlin.math.roundToInt
 
 
 class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig) :
@@ -66,11 +67,12 @@ class AdmobNativeAdAdapter(private val nativeAdapterConfig: NativeAdapterConfig)
 
     override fun getItemCount(): Int {
         val realCount = super.getItemCount()
-        return if (nativeAdapterConfig.isRepeat) {
-            realCount + realCount / nativeAdapterConfig.adItemInterval
+        val count = if (nativeAdapterConfig.isRepeat) {
+            realCount + (realCount / nativeAdapterConfig.adItemInterval.toFloat()).roundToInt()
         } else {
             realCount
         }
+        return count
     }
 
     private fun onBindAdViewHolder(holder: RecyclerView.ViewHolder) {

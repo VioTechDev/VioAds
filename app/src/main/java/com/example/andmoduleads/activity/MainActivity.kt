@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         // Initialize contacts
 
         // Initialize contacts
-        contacts = Contact.createContactsList(20)
+        contacts = Contact.createContactsList(2)
 
         // Create adapter passing in the sample user data
 
