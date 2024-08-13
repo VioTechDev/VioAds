@@ -17,5 +17,6 @@ class LoadingAdsDialog(context: Context) : Dialog(context, R.style.Dialog_FullSc
             WindowManager.LayoutParams.MATCH_PARENT
         )
         setContentView(R.layout.dialog_prepair_loading_ads)
+        setCancelable(false)
     }
 }

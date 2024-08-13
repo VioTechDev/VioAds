@@ -23,6 +23,7 @@ import com.ads.admob.helper.interstitial.params.InterstitialAdParam
 import com.ads.admob.helper.reward.RewardAdConfig
 import com.ads.admob.helper.reward.RewardAdHelper
 import com.ads.admob.helper.reward.params.RewardAdParam
+import com.ads.admob.listener.InterstitialAdCallback
 import com.ads.admob.listener.RewardAdCallBack
 import com.example.andmoduleads.Contact
 import com.example.andmoduleads.ContactsAdapter
@@ -45,8 +46,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initInterAdAd(): InterstitialAdHelper {
         val config = InterstitialAdConfig(
-            idAds = "7172848836d13826",
-            canShowAds = true,
+            idAds = "ca-app-pub-3940256099942544/1033173712",
+            canShowAds = false,
             canReloadAds = true,
             showByTime = 1,
             currentTime = 1
@@ -55,7 +56,37 @@ class MainActivity : AppCompatActivity() {
             activity = this,
             lifecycleOwner = this,
             config = config
-        )
+        ).apply {
+            registerAdListener(object : InterstitialAdCallback{
+                override fun onNextAction() {
+                    Log.e("TAG", "onNextAction: ", )
+                }
+
+                override fun onAdClose() {
+                }
+
+                override fun onInterstitialShow() {
+                }
+
+                override fun onAdLoaded(data: ContentAd) {
+                }
+
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                }
+
+                override fun onAdClicked() {
+
+                }
+
+                override fun onAdImpression() {
+                }
+
+                override fun onAdFailedToShow(adError: AdError) {
+                    Log.e("TAG", "onAdFailedToShow: ", )
+                }
+
+            })
+        }
     }
     private val rewardAdHelper by lazy {
         val rewardAdConfig = RewardAdConfig("f67842c7460f9215", 1, true, true)
@@ -141,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 
             })
         binding?.button3?.setOnClickListener {
-            rewardAdHelper.requestAds(RewardAdParam.ShowAd)
+            interAdHelper.requestAds(InterstitialAdParam.ShowAd)
         }
         binding?.frAds?.let {
             Log.e("TAG", "onCreate: ")
@@ -157,7 +188,7 @@ class MainActivity : AppCompatActivity() {
         // Initialize contacts
 
         // Initialize contacts
-        contacts = Contact.createContactsList(20)
+        contacts = Contact.createContactsList(2)
 
         // Create adapter passing in the sample user data
 

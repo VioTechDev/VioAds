@@ -4,10 +4,10 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.util.Log
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import arrow.atomic.AtomicBoolean
 import com.ads.admob.AdmobManager
 import com.ads.admob.data.ContentAd
 import com.ads.admob.dialog.LoadingAdsDialog
@@ -52,17 +52,13 @@ class AppResumeAdHelper(
     fun setEnableAppResumeOnScreen() {
         isDisableAppResumeOnScreen = false
     }
-
-    private var oldActivity: Activity? = null
-    private var isFistResumeApp = true
     private var requestAppOpenResumeValid = false
     fun requestAppOpenResume() {
-       requestAppOpenResumeValid = true
-        Log.e("AppOpenAdManager", "requestAppOpenResume: ", )
+        requestAppOpenResumeValid = true
     }
     init {
         lifecycleOwner.lifecycle.addObserver(this)
-        appOpenAdManager = AppOpenAdManager(config.networkProvider)
+        appOpenAdManager = AppOpenAdManager()
         appOpenAdManager?.setAdUnitId(config.idAds)
         appOpenAdManager?.setAppResumeConfig(config)
         appOpenAdManager?.registerLister(object : AppOpenAdCallBack {
@@ -171,16 +167,7 @@ class AppResumeAdHelper(
 
     private fun handleShowAppOpenResume(activity: Activity) {
         if (!isRequestAppResumeValid) return
-        if (oldActivity != activity) {
-            oldActivity = activity
-            isFistResumeApp = true
-        }
-//        if (isFistResumeApp) {
-//            isFistResumeApp = false
-//            Log.e(TAG, "handleShowAppOpenResume: 32", )
-//            return
-//        }
-        if (appOpenAdManager?.isAdAvailable() == true) {
+        if (lifecycleOwner.lifecycle.currentState == Lifecycle.State.CREATED && appOpenAdManager?.isAdAvailable() == true) {
             lifecycleOwner.lifecycleScope.launch {
                 showDialogLoading(activity)
                 delay(800)

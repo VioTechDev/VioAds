@@ -28,7 +28,7 @@ import java.util.Date
  * Created by ViO on 16/03/2024.
  */
 
-class AppOpenAdManager(private val networkManager: Int) {
+class AppOpenAdManager {
     companion object {
         val TAG = AppOpenAdManager::class.simpleName
     }
@@ -59,7 +59,7 @@ class AppOpenAdManager(private val networkManager: Int) {
      */
     fun loadAd(context: Context) {
         // Do not load ad if there is an unused ad or one is already loading.
-        if (isLoadingAd || isAdAvailable() || appResumeAdConfig?.canShowAds == false || appOpenAd != null) {
+        if (isLoadingAd || isAdAvailable() || appResumeAdConfig?.canShowAds == false) {
             Log.e(TAG, "loadAd: invalid", )
             return
         }

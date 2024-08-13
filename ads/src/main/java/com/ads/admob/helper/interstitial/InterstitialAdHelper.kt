@@ -1,7 +1,6 @@
 package com.ads.admob.helper.interstitial
 
 import android.app.Activity
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.ads.admob.AdmobManager
@@ -71,7 +70,38 @@ class InterstitialAdHelper(
                 lifecycleOwner.lifecycleScope.launch {
                     adInterstitialState.emit(AdInterstitialState.Fail)
                 }
-                invokeAdListener { it.onAdFailedToLoad(LoadAdError(99, "Request Invalid", "", null, null)) }
+                when (param) {
+                    is InterstitialAdParam.Request -> {
+                        invokeAdListener {
+                            it.onAdFailedToLoad(
+                                LoadAdError(
+                                    99,
+                                    "Request Invalid",
+                                    "",
+                                    null,
+                                    null
+                                )
+                            )
+                        }
+                    }
+
+                    is InterstitialAdParam.Show, is InterstitialAdParam.ShowAd -> {
+                        invokeAdListener { it.onNextAction() }
+                        invokeAdListener {
+                            it.onAdFailedToShow(
+                                AdError(
+                                    1999,
+                                    "Show ads InValid",
+                                    ""
+                                )
+                            )
+                        }
+                    }
+
+                    else -> {
+
+                    }
+                }
             }
         }
     }
@@ -102,9 +132,11 @@ class InterstitialAdHelper(
             && adInterstitialState.value != AdInterstitialState.Loading
         ) {
             invokeAdListener { it.onNextAction() }
+            invokeAdListener { it.onAdFailedToShow(AdError(1999, "Show ads InValid", "")) }
             requestAds(InterstitialAdParam.Request)
         } else {
             invokeAdListener { it.onNextAction() }
+            invokeAdListener { it.onAdFailedToShow(AdError(1999, "Show ads InValid", "")) }
         }
     }
 
@@ -185,6 +217,7 @@ class InterstitialAdHelper(
                 logZ("onAdFailedToShow ${adError.message}")
                 AdmobManager.adsFullScreenDismiss()
                 invokeAdListener { it.onNextAction() }
+                invokeAdListener { it.onAdFailedToShow(adError) }
                 dialogLoading.dismiss()
                 cancelLoadingJob()
                 lifecycleOwner.lifecycleScope.launch {

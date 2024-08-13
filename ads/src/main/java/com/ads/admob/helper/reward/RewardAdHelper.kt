@@ -68,7 +68,39 @@ class RewardAdHelper(
                     }
                 }
             } else {
-                invokeAdListener { it.onAdClose() }
+                when (param) {
+                    is RewardAdParam.Request -> {
+                        invokeAdListener { it.onAdClose() }
+                        invokeAdListener {
+                            it.onAdFailedToLoad(
+                                LoadAdError(
+                                    1999,
+                                    "Show ads InValid",
+                                    "",
+                                    null,
+                                    null
+                                )
+                            )
+                        }
+                    }
+
+                    is RewardAdParam.Show, is RewardAdParam.ShowAd -> {
+                        invokeAdListener { it.onAdClose() }
+                        invokeAdListener {
+                            it.onAdFailedToShow(
+                                AdError(
+                                    1999,
+                                    "Show ads InValid",
+                                    ""
+                                )
+                            )
+                        }
+                    }
+
+                    else -> {
+
+                    }
+                }
             }
         }
     }
@@ -184,6 +216,7 @@ class RewardAdHelper(
                 Log.e(TAG, "onAdFailedToShow: $adError", )
                 AdmobManager.adsFullScreenDismiss()
                 invokeAdListener { it.onAdClose() }
+                invokeAdListener { it.onAdFailedToShow(adError) }
                 dialogLoading.dismiss()
                 cancelLoadingJob()
                 lifecycleOwner.lifecycleScope.launch {
