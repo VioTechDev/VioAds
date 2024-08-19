@@ -54,6 +54,9 @@ class InterstitialAdHelper(
                     is InterstitialAdParam.Show -> {
                         flagActive.compareAndSet(false, true)
                         interstitialAdValue = param.interstitialAd
+                        lifecycleOwner.lifecycleScope.launch {
+                            adInterstitialState.emit(AdInterstitialState.Loaded)
+                        }
                         showInterAds(activity)
                     }
 
