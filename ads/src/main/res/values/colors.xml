@@ -41,4 +41,6 @@
     <color name="gnt_outline">#E0E0E0</color>
     <color name="tt_white">#FFFFFF</color>
     <color name="tt_transparent">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>
